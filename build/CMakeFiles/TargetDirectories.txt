@@ -1,3 +1,0 @@
-/home/efe/Documents/cengProjects/github/opengltest/LinuxVersion/build/CMakeFiles/MAIN_EXEC.dir
-/home/efe/Documents/cengProjects/github/opengltest/LinuxVersion/build/CMakeFiles/edit_cache.dir
-/home/efe/Documents/cengProjects/github/opengltest/LinuxVersion/build/CMakeFiles/rebuild_cache.dir
