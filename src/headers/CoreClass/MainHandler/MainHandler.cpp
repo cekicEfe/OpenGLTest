@@ -1,0 +1,953 @@
+#include "MainHandler.h"
+
+std::vector<std::unique_ptr<core::CoreEntity>> core::MainHandler::msEntities;
+std::vector<std::unique_ptr<Model::Model>> core::MainHandler::msObjectModels;
+std::map<Model::Model *, std::vector<core::CoreEntity *>> core::MainHandler::msModelEntityMap;
+
+std::vector<std::unique_ptr<Model::Light>> core::MainHandler::msLights;
+std::vector<std::unique_ptr<Shader>> core::MainHandler::msShaders;
+std::vector<std::string> core::MainHandler::msShaderPaths;
+
+std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonScenes;
+std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonPrecepts;
+
+std::vector<std::string> core::MainHandler::msJsonScenePaths;
+std::vector<std::string> core::MainHandler::msJsonPreceptPaths;
+
+// Gui related functions
+
+void core::MainHandler::showGui()
+{
+    if (!MainHandlerVariables.simuFlag)
+    {
+        ImGui::Begin("Main Menu");
+
+        ImGui::BeginGroup();
+        if (ImGui::CollapsingHeader("Entity Config"))
+        {
+            ImGui::Indent();
+            if (ImGui::CollapsingHeader("Entity Creation"))
+            {
+                ImGui::Indent();
+
+                if (ImGui::Button("Add Entity To Back"))
+                {
+                    core::MainHandler::addCoreEntity();
+                }
+
+                static int localEntityChoice = -1;
+
+                ImGui::InputInt("Input Entity to destroy", &localEntityChoice);
+
+                if (ImGui::Button("Delete Entity"))
+                {
+                    if (core::MainHandler::msEntities.size() > 0 && core::MainHandler::msEntities.size() >= localEntityChoice && localEntityChoice > 0)
+                    {
+                        core::MainHandler::msEntities.erase(core::MainHandler::msEntities.begin() + localEntityChoice - 1);
+                    }
+                }
+
+                ImGui::BeginGroup();
+                if (ImGui::CollapsingHeader("Entity List") && core::MainHandler::msEntities.size() > 0)
+                {
+                    ImGui::Indent();
+                    for (size_t i = 0; i < core::MainHandler::msEntities.size(); i++)
+                    {
+                        std::string headerLabel = "Entity " + std::to_string(i + 1);
+
+                        if (ImGui::CollapsingHeader(headerLabel.c_str()))
+                        {
+                            static int localChoice = 0;
+                            ImGui::InputInt(("Input new model id for " + headerLabel).c_str(), &localChoice);
+                            if (ImGui::Button(("Assign new model to " + headerLabel).c_str()) && localChoice <= core::MainHandler::msObjectModels.size() && localChoice > 0)
+                            {
+                                core::MainHandler::msEntities.at(i).get()->mpModel = core::MainHandler::msObjectModels.at(localChoice - 1).get();
+                            }
+
+                            auto ptr = core::MainHandler::msEntities.at(i).get();
+                            ImGui::BulletText("objects address : %p", ptr);
+                            ImGui::BulletText("objects position : x:%f y:%f z:%f ", ptr->mPos.x, ptr->mPos.y, ptr->mPos.z);
+                            if (ptr->mpModel != nullptr)
+                                ImGui::BulletText("objects models address : %p", ptr->mpModel);
+                            if (ptr->mpModel != nullptr)
+                                ImGui::BulletText("objects models directory : %s", ptr->mpModel->directory.c_str());
+
+                            ImGui::SliderFloat((headerLabel + " position x").c_str(), &core::MainHandler::msEntities.at(i).get()->mPos.x, -100.0f, 100.0f);
+                            ImGui::SliderFloat((headerLabel + " position y").c_str(), &core::MainHandler::msEntities.at(i).get()->mPos.y, -100.0f, 100.0f);
+                            ImGui::SliderFloat((headerLabel + " position z").c_str(), &core::MainHandler::msEntities.at(i).get()->mPos.z, -100.0f, 100.0f);
+                            ImGui::SliderFloat((headerLabel + " rot degree ").c_str(), &core::MainHandler::msEntities.at(i).get()->mRotDegreeRad, -2 * glm::pi<GLfloat>(), 2 * glm::pi<GLfloat>());
+                        }
+                    }
+                }
+                ImGui::EndGroup();
+
+                if (ImGui::Button("Load ALL Model Files"))
+                {
+                    core::MainHandler::loadAllModels();
+                }
+
+                ImGui::BeginGroup();
+                if (ImGui::CollapsingHeader("Entity Models") && core::MainHandler::msObjectModels.size() > 0)
+                {
+                    ImGui::Indent();
+                    for (size_t i = 0; i < core::MainHandler::msObjectModels.size(); i++)
+                    {
+                        std::string headerLabel = "Model " + std::to_string(i + 1);
+
+                        if (ImGui::CollapsingHeader(headerLabel.c_str()))
+                        {
+                            ImGui::BulletText("Model address : %p", core::MainHandler::msObjectModels.at(i).get());
+                            ImGui::BulletText("Model directory : %s", core::MainHandler::msObjectModels.at(i).get()->directory.c_str());
+                        }
+                    }
+                }
+                ImGui::EndGroup();
+            }
+        }
+        ImGui::EndGroup();
+
+        ImGui::BeginGroup();
+        if (ImGui::CollapsingHeader("Main Shader Config"))
+        {
+            ImGui::Indent();
+            ImGui::BeginGroup();
+            if (ImGui::Button("Load ALL shader paths"))
+            {
+                core::MainHandler::loadAllShaderPaths();
+            }
+            ImGui::EndGroup();
+
+            ImGui::BeginGroup();
+            if (ImGui::CollapsingHeader("Shader related files") && core::MainHandler::msShaderPaths.size() > 0)
+            {
+                ImGui::Indent();
+                ImGui::BeginGroup();
+                for (GLuint i = 0; i < msShaderPaths.size(); i++)
+                {
+                    ImGui::BulletText("%d %s", i + 1, msShaderPaths.at(i).c_str());
+                }
+                ImGui::EndGroup();
+            }
+            ImGui::EndGroup();
+
+            ImGui::BeginGroup();
+            if (ImGui::CollapsingHeader("Shader creation menu"))
+            {
+                static int sVertIndex = 0;
+                static int sFragIndex = 0;
+                static std::string vertShaderPath;
+                static std::string fragShaderPath;
+
+                ImGui::Indent();
+                ImGui::BeginGroup();
+                ImGui::InputInt("Input vertshader index", &sVertIndex);
+                ImGui::InputInt("Input fragshader index", &sFragIndex);
+                if (ImGui::Button("Make Shader"))
+                {
+                    if ((sVertIndex - 1 < core::MainHandler::msShaderPaths.size() && sVertIndex - 1 >= 0 && core::MainHandler::msShaderPaths.size() > 0) && (sFragIndex - 1 < core::MainHandler::msShaderPaths.size() && sFragIndex - 1 >= 0 && core::MainHandler::msShaderPaths.size() > 0))
+                    {
+                        vertShaderPath = core::MainHandler::msShaderPaths.at(sVertIndex - 1);
+                        fragShaderPath = core::MainHandler::msShaderPaths.at(sFragIndex - 1);
+                        core::MainHandler::msShaders.push_back(std::make_unique<Shader>(vertShaderPath.c_str(), fragShaderPath.c_str()));
+                    }
+                }
+                ImGui::EndGroup();
+
+                ImGui::BeginGroup();
+                if (ImGui::Button("Pop Shaders from Back"))
+                {
+                    if (core::MainHandler::msShaders.size() > 0)
+                        core::MainHandler::msShaders.pop_back();
+                }
+                ImGui::EndGroup();
+
+                ImGui::BeginGroup();
+                if (ImGui::CollapsingHeader("Shader List") && core::MainHandler::msShaders.size() > 0)
+                {
+                    ImGui::Indent();
+                    for (GLuint i = 0; i < core::MainHandler::msShaders.size(); i++)
+                    {
+                        ImGui::BulletText("Shader address : %p", core::MainHandler::msShaders.at(i).get());
+                    }
+                }
+                ImGui::EndGroup();
+            }
+            ImGui::EndGroup();
+        }
+        ImGui::EndGroup();
+
+        ImGui::BeginGroup();
+        if (ImGui::CollapsingHeader("Light Config"))
+        {
+            ImGui::Indent();
+            if (ImGui::Button("Create Point Light"))
+            {
+                core::MainHandler::msLights.push_back(std::make_unique<Model::Light>());
+            }
+            static int localLightChoice = -1;
+            ImGui::InputInt("Input Light to destroy", &localLightChoice);
+            if (ImGui::Button("Delete Light"))
+            {
+                if ((core::MainHandler::msLights.size() > 0) && localLightChoice > 0 && core::MainHandler::msLights.size() >= localLightChoice)
+                {
+                    core::MainHandler::msLights.erase(core::MainHandler::msLights.begin() + (localLightChoice - 1));
+                    localLightChoice = -1;
+                }
+            }
+
+            ImGui::BeginGroup();
+            if (ImGui::CollapsingHeader("Light List") && core::MainHandler::msLights.size() > 0)
+            {
+                ImGui::Indent();
+                for (GLuint i = 0; i < core::MainHandler::msLights.size(); i++)
+                {
+                    std::string headerLabel = "Light " + std::to_string(i + 1);
+                    if (ImGui::CollapsingHeader(headerLabel.c_str()))
+                    {
+                        ImGui::SliderFloat((headerLabel + " Position x").c_str(), &core::MainHandler::msLights.at(i).get()->light_pos.x, -100.0f, 100.0f);
+                        ImGui::SliderFloat((headerLabel + " Position y").c_str(), &core::MainHandler::msLights.at(i).get()->light_pos.y, -100.0f, 100.0f);
+                        ImGui::SliderFloat((headerLabel + " Position z").c_str(), &core::MainHandler::msLights.at(i).get()->light_pos.z, -100.0f, 100.0f);
+                        ImGui::SliderFloat((headerLabel + " Color r ").c_str(), &core::MainHandler::msLights.at(i).get()->light_color.x, 0.0f, 1.0f);
+                        ImGui::SliderFloat((headerLabel + " Color g ").c_str(), &core::MainHandler::msLights.at(i).get()->light_color.y, 0.0f, 1.0f);
+                        ImGui::SliderFloat((headerLabel + " Color b ").c_str(), &core::MainHandler::msLights.at(i).get()->light_color.z, 0.0f, 1.0f);
+                    }
+                }
+            }
+            ImGui::EndGroup();
+        }
+        ImGui::EndGroup();
+
+        ImGui::BeginGroup();
+        if (ImGui::CollapsingHeader("Json precept config"))
+        {
+            ImGui::Indent();
+            ImGui::BeginGroup();
+            if (ImGui::CollapsingHeader("Json precept path config"))
+            {
+                ImGui::Indent();
+
+                ImGui::BeginGroup();
+                if (ImGui::Button("Load ALL Json Precept paths"))
+                {
+                    core::MainHandler::loadAllJsonPreceptPath();
+                }
+                ImGui::EndGroup();
+
+                ImGui::BeginGroup();
+                if (ImGui::CollapsingHeader("Loaded Json Precept Paths") && core::MainHandler::msJsonPreceptPaths.size() > 0)
+                {
+                    ImGui::Indent();
+                    ImGui::BeginGroup();
+                    for (GLuint i = 0; i < core::MainHandler::msJsonPreceptPaths.size(); i++)
+                    {
+                        std::string headerLabel = core::MainHandler::msJsonPreceptPaths.at(i);
+                        ImGui::BulletText(headerLabel.c_str());
+                    }
+                    ImGui::EndGroup();
+                }
+                ImGui::EndGroup();
+            }
+            ImGui::EndGroup();
+        }
+        ImGui::EndGroup();
+
+        ImGui::BeginGroup();
+        if (ImGui::CollapsingHeader("Save/Load config"))
+        {
+            ImGui::Indent();
+
+            ImGui::Text("Load config :");
+            
+            //Loads saved paths
+            if (ImGui::Button("Load all save paths"))
+                core::MainHandler::loadAllScenePaths();
+            
+            //Shows all loaded paths
+            ImGui::BeginGroup();
+            if (ImGui::CollapsingHeader("Saved paths"))
+            {
+                ImGui::Indent();
+                //loaded paths
+                for (GLuint i = 0; i < core::MainHandler::msJsonScenePaths.size(); i++)
+                    ImGui::BulletText(core::MainHandler::msJsonScenePaths.at(i).c_str());
+            }
+            ImGui::EndGroup();
+
+            //Filename var 
+            static char fileName[100];
+            ImGui::InputText("Enter file name to load from", fileName , 100);
+            //Loads a save with parameters
+            if(ImGui::Button("Load save file") && strcmp(fileName,"") && std::filesystem::exists(cJsonScenesPath+fileName+cJsonExtension))
+            {
+                core::MainHandler::loadSceneFromJson(fileName);
+                strcpy(fileName,"");
+            }
+
+
+            ImGui::Text("Save config :");
+            static char saveNameToSave[100];
+            ImGui::InputText("Enter file name to save",saveNameToSave,IM_ARRAYSIZE(saveNameToSave));
+            static bool optionOverwrite = false;
+            ImGui::Checkbox("Overwrite ?",&optionOverwrite);
+            if(ImGui::Button("Save as json"))
+            {
+                core::MainHandler::saveSceneAsJson(saveNameToSave,optionOverwrite);
+                optionOverwrite = false;
+                strcpy(saveNameToSave,"");
+            }
+
+        }
+        ImGui::EndGroup();
+
+        ImGui::End();
+    }
+}
+
+// Filesystem related functions
+
+void core::MainHandler::loadAllJsonPreceptPath()
+{
+    if (core::MainHandler::msJsonPreceptPaths.size() == 0)
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    std::cout << entry.path() << std::endl;
+                    core::MainHandler::msJsonPreceptPaths.push_back(std::string(entry.path().c_str()));
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at json precept: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at json precept: " << e.what() << std::endl;
+        }
+    }
+    else
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    for (GLuint i = 0; i < core::MainHandler::msJsonPreceptPaths.size(); i++)
+                    {
+                        if (core::MainHandler::msJsonPreceptPaths.at(i) == std::string(entry.path()))
+                        {
+                            std::cout << "SAME " << std::endl;
+                            break;
+                        }
+                        else if (i == core::MainHandler::msJsonPreceptPaths.size() - 1 &&
+                                 core::MainHandler::msJsonPreceptPaths.at(i) != std::string(entry.path()))
+                        {
+
+                            core::MainHandler::msJsonPreceptPaths.push_back(std::string(entry.path()));
+                        }
+                    }
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at json precept: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at json precept: " << e.what() << std::endl;
+        }
+    }
+}
+
+void core::MainHandler::loadAllScenePaths()
+{
+    if (core::MainHandler::msJsonScenePaths.size() == 0)
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonScenesPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    std::cout << entry.path() << std::endl;
+                    core::MainHandler::msJsonScenePaths.push_back(std::string(entry.path().c_str()));
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at json scene: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at json scene: " << e.what() << std::endl;
+        }
+    }
+    else
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonScenesPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    for (GLuint i = 0; i < core::MainHandler::msJsonScenePaths.size(); i++)
+                    {
+                        if (core::MainHandler::msJsonScenePaths.at(i) == std::string(entry.path()))
+                        {
+                            std::cout << "SAME " << std::endl;
+                            break;
+                        }
+                        else if (i == core::MainHandler::msJsonScenePaths.size() - 1 &&
+                                 core::MainHandler::msJsonScenePaths.at(i) != std::string(entry.path()))
+                        {
+
+                            core::MainHandler::msJsonScenePaths.push_back(std::string(entry.path()));
+                        }
+                    }
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at json scene: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at json scene: " << e.what() << std::endl;
+        }
+    }
+}
+
+void core::MainHandler::loadAllJsonPrecepts()
+{
+    // the first load
+    if (core::MainHandler::msJsonPrecepts.size() == 0)
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    std::cout << entry.path() << std::endl;
+                    core::MainHandler::msJsonPrecepts.emplace_back((core::JsonExtractor::loadJsonFromPath(std::string(entry.path()))));
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at loadJsonPrecept: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at loadJsonPrecept: " << e.what() << std::endl;
+        }
+    }
+    // second load
+    else
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
+            {
+                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
+                {
+                    for (GLuint i = 0; i < core::MainHandler::msJsonPrecepts.size(); i++)
+                    {
+                        std::unique_ptr<nlohmann::json> jsonPtr(core::JsonExtractor::loadJsonFromPath(std::string(entry.path())));
+                        if (*core::MainHandler::msJsonPrecepts.at(i).get() == *jsonPtr.get())
+                        {
+                            std::cout << "SAME " << std::endl;
+                            jsonPtr.reset();
+                            break;
+                        }
+                        else if ((i == core::MainHandler::msJsonPrecepts.size() - 1) &&
+                                 (*core::MainHandler::msJsonPrecepts.at(i).get() != *jsonPtr.get()))
+                        {
+                            core::MainHandler::msJsonPrecepts.emplace_back((core::JsonExtractor::loadJsonFromPath(std::string(entry.path()))));
+                            jsonPtr.reset();
+                        }
+                    }
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at core::MainHandler::loadAllJsonPrecepts: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at core::MainHandler::loadAllJsonPrecepts: " << e.what() << std::endl;
+        }
+    }
+}
+
+void core::MainHandler::loadAllShaderPaths()
+{
+    if (msShaderPaths.size() == 0)
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cShadersPath))
+            {
+                if ((entry.is_regular_file() && entry.path().extension() == core::cVertShaderExtension) || (entry.is_regular_file() && entry.path().extension() == core::cFragShaderExtension))
+                {
+                    std::cout << entry.path() << std::endl;
+                    msShaderPaths.push_back(entry.path().c_str());
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at shaderlist: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at shaderlist: " << e.what() << std::endl;
+        }
+    }
+    else
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cShadersPath))
+            {
+                if ((entry.is_regular_file() && entry.path().extension() == core::cVertShaderExtension) || (entry.is_regular_file() && entry.path().extension() == core::cFragShaderExtension))
+                {
+                    for (GLuint i = 0; i < msShaderPaths.size(); i++)
+                    {
+                        if (msShaderPaths.at(i) == std::string(entry.path()))
+                        {
+                            std::cout << "SAME " << std::endl;
+                            break;
+                        }
+                        else if ((i == core::MainHandler::msShaderPaths.size() - 1) &&
+                                 (core::MainHandler::msShaderPaths.at(i) != std::string(entry.path())))
+                        {
+                            msShaderPaths.push_back(std::string(entry.path()));
+                        }
+                    }
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at shaderList : " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at shaderList : " << e.what() << std::endl;
+        }
+    }
+}
+
+void core::MainHandler::loadAllModels()
+{
+    // the first load
+    if (core::MainHandler::msObjectModels.size() == 0)
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cModelsPath))
+            {
+                if ((entry.is_regular_file() && entry.path().extension() == core::cModelObjExtension) ||
+                    (entry.is_regular_file() && entry.path().extension() == core::cModelFBXExtension))
+                {
+                    std::cout << entry.path() << std::endl;
+                    core::MainHandler::msObjectModels.push_back(std::make_unique<Model::Model>(std::string(entry.path())));
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at loadModels: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at loadModels: " << e.what() << std::endl;
+        }
+    }
+    // second load
+    else
+    {
+        try
+        {
+            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cModelsPath))
+            {
+                if ((entry.is_regular_file() && entry.path().extension() == core::cModelObjExtension) ||
+                    (entry.is_regular_file() && entry.path().extension() == core::cModelFBXExtension))
+                {
+                    for (GLuint i = 0; i < core::MainHandler::msObjectModels.size(); i++)
+                    {
+                        if (core::MainHandler::msObjectModels.at(i).get()->directory == std::string(entry.path().parent_path()))
+                        {
+                            std::cout << "SAME " << std::endl;
+                            break;
+                        }
+                        else if ((i == core::MainHandler::msObjectModels.size() - 1) &&
+                                 (core::MainHandler::msObjectModels.at(i).get()->directory != std::string(entry.path().parent_path())))
+                        {
+                            core::MainHandler::msObjectModels.push_back(std::make_unique<Model::Model>(std::string(entry.path())));
+                        }
+                    }
+                }
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Filesystem error at loadModels: " << e.what() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "General error at loadModels: " << e.what() << std::endl;
+        }
+    }
+}
+
+void core::MainHandler::saveSceneAsJson(std::string inputFileName, GLboolean overwriteOption)
+{
+    std::string fullPath = cJsonScenesPath + inputFileName + cJsonExtension;
+
+    // Stops if filename exists takes overwriteOption as parameter
+    if (std::filesystem::exists(fullPath) && overwriteOption == false)
+    {
+        std::cerr << "File already exists (core::MainHandler::saveSceneAsJson) !" << std::endl;
+        throw std::invalid_argument("FILE::EXIST");
+    }
+
+    std::filesystem::path filePath = fullPath;
+
+    // Deletes if filename exist uses overwriteoption as parameter
+    if (std::filesystem::exists(fullPath) && overwriteOption == true)
+    {
+        try
+        {
+            if (std::filesystem::remove(filePath))
+            {
+                std::cout << "File deleted successfully.\n";
+            }
+            else
+            {
+                std::cout << "File does not exist.\n";
+            }
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cerr << "Error: " << e.what() << '\n';
+        }
+    }
+
+    // Saves the file
+    std::ofstream file(fullPath);
+    if (file.is_open())
+    {
+        GLuint count = 0;
+        nlohmann::json newJsonFile;
+
+        // Saves models here
+        for (GLuint i = 0; i < core::MainHandler::msObjectModels.size(); i++)
+        {
+            nlohmann::json modelJson;
+            modelJson["Path"] = core::MainHandler::msObjectModels.at(i).get()->path;
+            newJsonFile["Models"].push_back(modelJson);
+            count = i + 1;
+        }
+        newJsonFile["Model Count"] = count;
+        count = 0;
+
+        // Saves Shaders Here
+        for (GLuint i = 0; i < core::MainHandler::msShaders.size(); i++)
+        {
+            nlohmann::json shaderJson;
+            shaderJson["FragPath"] = core::MainHandler::msShaders.at(i).get()->fragmentPath.c_str();
+            shaderJson["VertPath"] = core::MainHandler::msShaders.at(i).get()->vertexPath.c_str();
+            newJsonFile["Shaders"].push_back(shaderJson);
+            count = i + 1;
+        }
+        newJsonFile["Shader Count"] = count;
+        count = 0;
+
+        // Saves Entities here
+        for (GLuint i = 0; i < core::MainHandler::msEntities.size(); i++)
+            newJsonFile["Entities"].push_back(core::MainHandler::msEntities.at(i).get()->saveAsJson()), count = i + 1;
+        newJsonFile["Entity Count"] = count;
+        count = 0;
+
+        // Saves Lights here
+        for (GLuint i = 0; i < core::MainHandler::msLights.size(); i++)
+            newJsonFile["Lights"].push_back(core::MainHandler::msLights.at(i).get()->saveAsJson()), count = i + 1;
+        newJsonFile["Light Count"] = count;
+        count = 0;
+
+        std::string jsonString = newJsonFile.dump(1);
+        file << jsonString;
+        file.close();
+    }
+    else
+    {
+        std::cerr << "Could not create file (core::MainHandler::saveSceneAsJson)" << std::endl;
+        throw std::invalid_argument("SYSTEM::ERROR");
+    }
+}
+
+void core::MainHandler::loadSceneFromJson(std::string filename)
+{
+    nlohmann::json *newJsonPtr = core::JsonExtractor::loadJsonFromPath(core::cJsonScenesPath + filename + cJsonExtension);
+    nlohmann::json newJson = *newJsonPtr;
+    
+    std::cout << core::cJsonScenesPath + filename + cJsonExtension << std::endl;
+    std::cout << newJson.dump(4);
+
+    delete newJsonPtr;
+    newJsonPtr = nullptr;
+
+    core::MainHandler::msShaders.clear();
+    core::MainHandler::msLights.clear();
+    core::MainHandler::msObjectModels.clear();
+    core::MainHandler::msEntities.clear();
+
+    GLuint entityCount = newJson["Entity Count"].get<GLuint>();
+    GLuint modelCount = newJson["Model Count"].get<GLuint>();
+    GLuint lightCount = newJson["Light Count"].get<GLuint>();
+    GLuint shaderCount = newJson["Shader Count"].get<GLuint>();
+
+    std::cout << "Loading shaders" << std::endl;
+    for (GLuint i = 0; i < shaderCount; i++)
+    {
+        std::string vertPath = newJson["Shaders"][i]["VertPath"].get<std::string>();
+        std::string fragPath = newJson["Shaders"][i]["FragPath"].get<std::string>();
+        Shader *newShader = new Shader(vertPath.c_str(), fragPath.c_str());
+        core::MainHandler::msShaders.push_back(std::unique_ptr<Shader>(newShader));
+        newShader = nullptr;
+    }
+
+    std::cout << "Loading lights" << std::endl;
+    for (GLuint i = 0; i < lightCount; i++)
+    {
+        Model::Light *newLight = new Model::Light();
+
+        newLight->light_color.x = newJson["Lights"][i]["Light Color"][0].get<GLfloat>();
+        newLight->light_color.y = newJson["Lights"][i]["Light Color"][1].get<GLfloat>();
+        newLight->light_color.z = newJson["Lights"][i]["Light Color"][2].get<GLfloat>();
+
+        newLight->light_pos.x = newJson["Lights"][i]["Light Position"][0].get<GLfloat>();
+        newLight->light_pos.y = newJson["Lights"][i]["Light Position"][1].get<GLfloat>();
+        newLight->light_pos.z = newJson["Lights"][i]["Light Position"][2].get<GLfloat>();
+
+        newLight->ambient = newJson["Lights"][i]["Ambient"].get<GLfloat>();
+        newLight->diffuse = newJson["Lights"][i]["Diffuse"].get<GLfloat>();
+        newLight->specular = newJson["Lights"][i]["Specular"].get<GLfloat>();
+
+        core::MainHandler::msLights.push_back(std::unique_ptr<Model::Light>(newLight));
+        newLight = nullptr;
+    }
+
+    std::cout << "Loading models" << std::endl;
+    for (GLuint i = 0; i < modelCount; i++)
+    {
+        Model::Model *newModel = new Model::Model(newJson["Models"][i]["Path"].get<std::string>());
+        core::MainHandler::msObjectModels.push_back(std::unique_ptr<Model::Model>(newModel));
+        newModel = nullptr;
+    }
+
+    std::cout << "Loading entities" << std::endl;
+    for (GLuint i = 0; i < entityCount; i++)
+    {
+        core::CoreEntity *newEntity = new CoreEntity();
+        newEntity->mPos.x = newJson["Entities"][i]["Pos vector"][0].get<GLfloat>();
+        newEntity->mPos.y = newJson["Entities"][i]["Pos vector"][1].get<GLfloat>();
+        newEntity->mPos.z = newJson["Entities"][i]["Pos vector"][2].get<GLfloat>();
+
+        newEntity->mRotAxis.x = newJson["Entities"][i]["Rot vector"][0].get<GLfloat>();
+        newEntity->mRotAxis.y = newJson["Entities"][i]["Rot vector"][1].get<GLfloat>();
+        newEntity->mRotAxis.z = newJson["Entities"][i]["Rot vector"][2].get<GLfloat>();
+
+        newEntity->mRotDegreeRad = newJson["Entities"][i]["Rot degree"].get<GLfloat>();
+
+        newEntity->mModelScale.x = newJson["Entities"][i]["Model Scale"][0].get<GLfloat>();
+        newEntity->mModelScale.y = newJson["Entities"][i]["Model Scale"][1].get<GLfloat>();
+        newEntity->mModelScale.z = newJson["Entities"][i]["Model Scale"][2].get<GLfloat>();
+
+        for (GLuint j = 0; j < core::MainHandler::msObjectModels.size(); j++)
+        {
+            if (newJson["Entities"][i]["Model Path"].get<std::string>() == core::MainHandler::msObjectModels.at(j).get()->path)
+            {
+                newEntity->mpModel = core::MainHandler::msObjectModels.at(j).get();
+                break;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        core::MainHandler::msEntities.push_back(std::unique_ptr<core::CoreEntity>(newEntity));
+        newEntity = nullptr;
+    }
+    std::cout << "Loaded save succelsadqfully !" << std::endl;
+}
+
+// Runtime related functions
+
+void core::MainHandler::addCoreEntity()
+{
+    CoreEntity *newCoreEntity = new CoreEntity();
+    core::MainHandler::msEntities.emplace_back(newCoreEntity);
+}
+
+void core::MainHandler::addCoreEntity(Model::Model *entityModel)
+{
+    CoreEntity *newCoreEntity = new CoreEntity();
+    newCoreEntity->mpModel = entityModel;
+    core::MainHandler::msEntities.push_back(std::unique_ptr<CoreEntity>(newCoreEntity));
+    newCoreEntity = nullptr;
+}
+
+// System related functions
+
+// Also handles camera
+void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
+{
+    // wait time for pressing esc
+    static GLfloat waitTime = 0.0f;
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && waitTime <= 0)
+    {
+        MainHandlerVariables.simuFlag = !MainHandlerVariables.simuFlag;
+        MainHandlerVariables.firstMouse = true;
+        glfwSetCursorPos(window, MainHandlerVariables.SCR_WIDTH / 2, MainHandlerVariables.SCR_HEIGHT / 2);
+        waitTime = 0.35f;
+    }
+    if (MainHandlerVariables.simuFlag)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.MovementSpeed = SPEED * 2;
+        else
+            MainHandlerVariables.mainCamera.MovementSpeed = SPEED;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.MovementSpeed = SPEED / 2;
+        else
+            MainHandlerVariables.mainCamera.MovementSpeed = SPEED;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(FORWARD, MainHandlerVariables.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(BACKWARD, MainHandlerVariables.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(LEFT, MainHandlerVariables.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(RIGHT, MainHandlerVariables.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(DOWNWARD, MainHandlerVariables.deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            MainHandlerVariables.mainCamera.ProcessKeyboard(UPWARD, MainHandlerVariables.deltaTime);
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    // decreases wait time
+    if (waitTime - deltaTime <= 0) // somehow
+        waitTime = 0;
+    else
+        waitTime -= deltaTime;
+}
+
+void core::MainHandler::DrawInstanced()
+{
+    core::RenderFunctor::DrawInstanced(
+        core::MainHandlerVariables.SCR_WIDTH,
+        core::MainHandlerVariables.SCR_HEIGHT,
+        &core::MainHandler::msShaders,
+        &core::MainHandlerVariables.mainCamera,
+        &core::MainHandler::msLights,
+        &core::MainHandler::msEntities);
+}
+
+void core::MainHandler::DrawInstancedWithInterval(GLfloat deltaTime, GLfloat intervalMS)
+{
+    static GLfloat remainingTimeMicroSecond = intervalMS;
+    if (remainingTimeMicroSecond >= 0)
+    {
+        remainingTimeMicroSecond -= deltaTime;
+    }
+    else
+    {
+        core::MainHandler::DrawInstanced();
+        remainingTimeMicroSecond = intervalMS;
+    }
+}
+
+void core::MainHandler::framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void core::MainHandler::mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
+{
+    float ypos = static_cast<float>(yposIn);
+    float xpos = static_cast<float>(xposIn);
+
+    float xoffset = 0;
+    float yoffset = 0;
+
+    if (MainHandlerVariables.simuFlag)
+    {
+        if (MainHandlerVariables.firstMouse)
+        {
+            MainHandlerVariables.lastX = xpos;
+            MainHandlerVariables.lastY = ypos;
+            MainHandlerVariables.firstMouse = false;
+        }
+        else
+        {
+            xoffset = xpos - MainHandlerVariables.lastX;
+            yoffset = MainHandlerVariables.lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+            MainHandlerVariables.lastX = xpos;
+            MainHandlerVariables.lastY = ypos;
+        }
+
+        MainHandlerVariables.mainCamera.ProcessMouseMovement(xoffset, yoffset);
+    }
+}
+
+void core::MainHandler::scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    if (MainHandlerVariables.simuFlag)
+        MainHandlerVariables.mainCamera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+void core::MainHandler::calculateDeltaTime()
+{
+    float currentFrame = static_cast<float>(glfwGetTime());
+    MainHandlerVariables.deltaTime = currentFrame - MainHandlerVariables.lastFrame;
+    MainHandlerVariables.counter++;
+
+    if (MainHandlerVariables.deltaTime >= 1.0f / 30.0f)
+    {
+        MainHandlerVariables.lastFrame = currentFrame;
+        MainHandlerVariables.counter = 0;
+    }
+}
+
+GLfloat core::MainHandler::returnDeltaTime()
+{
+    return MainHandlerVariables.deltaTime;
+}
+
+GLuint core::MainHandler::returnSCR_WIDTH()
+{
+    return core::MainHandlerVariables.SCR_WIDTH;
+}
+
+GLuint core::MainHandler::returnSCR_HEIGHT()
+{
+    return core::MainHandlerVariables.SCR_HEIGHT;
+}

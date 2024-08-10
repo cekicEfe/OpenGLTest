@@ -1,0 +1,34 @@
+#ifndef COREOBJECT_H
+#define COREOBJECT_H
+
+#include <CoreClass/CoreClass.h>
+#include <json/json.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <model/Model.h>
+#include <vector>
+#include <memory>
+
+namespace core
+{
+	class CoreEntity
+	{
+	public:
+		CoreEntity();
+	    virtual ~CoreEntity();
+		virtual nlohmann::json saveAsJson();
+	protected:
+		Model::Model *mpModel = nullptr;
+		glm::vec3 mModelScale = glm::vec3(1.0f);
+
+		glm::vec3 mPos = glm::vec3(0.0f);
+
+		glm::vec3 mRotAxis = glm::vec3(1.0f,0.0f,0.0f);
+		GLfloat mRotDegreeRad = 0;
+
+		virtual void update(GLfloat deltaTime);
+
+		friend class core::MainHandler;
+		friend class core::RenderFunctor;
+	};
+}
+#endif // !SCRIPTOBJECT
