@@ -4,18 +4,19 @@ std::vector<std::unique_ptr<core::CoreEntity>> core::MainHandler::msEntities;
 std::vector<std::unique_ptr<Model::Model>> core::MainHandler::msObjectModels;
 std::map<Model::Model *, std::vector<core::CoreEntity *>> core::MainHandler::msModelEntityMap;
 
+std::vector<std::string> core::MainHandler::msJsonScenePaths;
+std::vector<std::string> core::MainHandler::msJsonPreceptPaths;
+std::vector<std::string> core::MainHandler::msShaderPaths;
+
 std::vector<std::unique_ptr<Model::Light>> core::MainHandler::msLights;
 std::vector<std::unique_ptr<Shader>> core::MainHandler::msShaders;
-std::vector<std::string> core::MainHandler::msShaderPaths;
 
 std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonScenes;
 std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonPrecepts;
 
-std::vector<std::string> core::MainHandler::msJsonScenePaths;
-std::vector<std::string> core::MainHandler::msJsonPreceptPaths;
+
 
 // Gui related functions
-
 void core::MainHandler::showGui()
 {
     if (!MainHandlerVariables.simuFlag)
@@ -83,7 +84,7 @@ void core::MainHandler::showGui()
 
                 if (ImGui::Button("Load ALL Model Files"))
                 {
-                    core::MainHandler::loadAllModels();
+                    core::SaveLoadHandler::loadAllModels(&core::MainHandler::msObjectModels);
                 }
 
                 ImGui::BeginGroup();
@@ -113,7 +114,7 @@ void core::MainHandler::showGui()
             ImGui::BeginGroup();
             if (ImGui::Button("Load ALL shader paths"))
             {
-                core::MainHandler::loadAllShaderPaths();
+                core::SaveLoadHandler::loadAllShaderPaths(&core::MainHandler::msShaderPaths);
             }
             ImGui::EndGroup();
 
@@ -229,7 +230,7 @@ void core::MainHandler::showGui()
                 ImGui::BeginGroup();
                 if (ImGui::Button("Load ALL Json Precept paths"))
                 {
-                    core::MainHandler::loadAllJsonPreceptPath();
+                    core::SaveLoadHandler::loadAllJsonPreceptPath(&core::MainHandler::msJsonPreceptPaths);
                 }
                 ImGui::EndGroup();
 
@@ -260,7 +261,7 @@ void core::MainHandler::showGui()
             
             //Loads saved paths
             if (ImGui::Button("Load all save paths"))
-                core::MainHandler::loadAllScenePaths();
+                core::SaveLoadHandler::loadAllJsonScenePaths(&core::MainHandler::msJsonScenePaths);
             
             //Shows all loaded paths
             ImGui::BeginGroup();
@@ -279,7 +280,11 @@ void core::MainHandler::showGui()
             //Loads a save with parameters
             if(ImGui::Button("Load save file") && strcmp(fileName,"") && std::filesystem::exists(cJsonScenesPath+fileName+cJsonExtension))
             {
-                core::MainHandler::loadSceneFromJson(fileName);
+                core::SaveLoadHandler::loadSceneFromJson(fileName,
+                                                        &core::MainHandler::msObjectModels,
+                                                        &core::MainHandler::msShaders,
+                                                        &core::MainHandler::msEntities,
+                                                        &core::MainHandler::msLights);
                 strcpy(fileName,"");
             }
 
@@ -291,7 +296,11 @@ void core::MainHandler::showGui()
             ImGui::Checkbox("Overwrite ?",&optionOverwrite);
             if(ImGui::Button("Save as json"))
             {
-                core::MainHandler::saveSceneAsJson(saveNameToSave,optionOverwrite);
+                core::SaveLoadHandler::saveSceneAsJson(saveNameToSave,optionOverwrite,&core::MainHandler::msObjectModels,
+                                                        &core::MainHandler::msShaders,
+                                                        &core::MainHandler::msEntities,
+                                                        &core::MainHandler::msLights
+                );
                 optionOverwrite = false;
                 strcpy(saveNameToSave,"");
             }
@@ -303,498 +312,9 @@ void core::MainHandler::showGui()
     }
 }
 
-// Filesystem related functions
 
-void core::MainHandler::loadAllJsonPreceptPath()
-{
-    if (core::MainHandler::msJsonPreceptPaths.size() == 0)
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    std::cout << entry.path() << std::endl;
-                    core::MainHandler::msJsonPreceptPaths.push_back(std::string(entry.path().c_str()));
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at json precept: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at json precept: " << e.what() << std::endl;
-        }
-    }
-    else
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    for (GLuint i = 0; i < core::MainHandler::msJsonPreceptPaths.size(); i++)
-                    {
-                        if (core::MainHandler::msJsonPreceptPaths.at(i) == std::string(entry.path()))
-                        {
-                            std::cout << "SAME " << std::endl;
-                            break;
-                        }
-                        else if (i == core::MainHandler::msJsonPreceptPaths.size() - 1 &&
-                                 core::MainHandler::msJsonPreceptPaths.at(i) != std::string(entry.path()))
-                        {
-
-                            core::MainHandler::msJsonPreceptPaths.push_back(std::string(entry.path()));
-                        }
-                    }
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at json precept: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at json precept: " << e.what() << std::endl;
-        }
-    }
-}
-
-void core::MainHandler::loadAllScenePaths()
-{
-    if (core::MainHandler::msJsonScenePaths.size() == 0)
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonScenesPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    std::cout << entry.path() << std::endl;
-                    core::MainHandler::msJsonScenePaths.push_back(std::string(entry.path().c_str()));
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at json scene: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at json scene: " << e.what() << std::endl;
-        }
-    }
-    else
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonScenesPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    for (GLuint i = 0; i < core::MainHandler::msJsonScenePaths.size(); i++)
-                    {
-                        if (core::MainHandler::msJsonScenePaths.at(i) == std::string(entry.path()))
-                        {
-                            std::cout << "SAME " << std::endl;
-                            break;
-                        }
-                        else if (i == core::MainHandler::msJsonScenePaths.size() - 1 &&
-                                 core::MainHandler::msJsonScenePaths.at(i) != std::string(entry.path()))
-                        {
-
-                            core::MainHandler::msJsonScenePaths.push_back(std::string(entry.path()));
-                        }
-                    }
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at json scene: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at json scene: " << e.what() << std::endl;
-        }
-    }
-}
-
-void core::MainHandler::loadAllJsonPrecepts()
-{
-    // the first load
-    if (core::MainHandler::msJsonPrecepts.size() == 0)
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    std::cout << entry.path() << std::endl;
-                    core::MainHandler::msJsonPrecepts.emplace_back((core::JsonExtractor::loadJsonFromPath(std::string(entry.path()))));
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at loadJsonPrecept: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at loadJsonPrecept: " << e.what() << std::endl;
-        }
-    }
-    // second load
-    else
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cJsonPreceptPath))
-            {
-                if (entry.is_regular_file() && entry.path().extension() == core::cJsonExtension)
-                {
-                    for (GLuint i = 0; i < core::MainHandler::msJsonPrecepts.size(); i++)
-                    {
-                        std::unique_ptr<nlohmann::json> jsonPtr(core::JsonExtractor::loadJsonFromPath(std::string(entry.path())));
-                        if (*core::MainHandler::msJsonPrecepts.at(i).get() == *jsonPtr.get())
-                        {
-                            std::cout << "SAME " << std::endl;
-                            jsonPtr.reset();
-                            break;
-                        }
-                        else if ((i == core::MainHandler::msJsonPrecepts.size() - 1) &&
-                                 (*core::MainHandler::msJsonPrecepts.at(i).get() != *jsonPtr.get()))
-                        {
-                            core::MainHandler::msJsonPrecepts.emplace_back((core::JsonExtractor::loadJsonFromPath(std::string(entry.path()))));
-                            jsonPtr.reset();
-                        }
-                    }
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at core::MainHandler::loadAllJsonPrecepts: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at core::MainHandler::loadAllJsonPrecepts: " << e.what() << std::endl;
-        }
-    }
-}
-
-void core::MainHandler::loadAllShaderPaths()
-{
-    if (msShaderPaths.size() == 0)
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cShadersPath))
-            {
-                if ((entry.is_regular_file() && entry.path().extension() == core::cVertShaderExtension) || (entry.is_regular_file() && entry.path().extension() == core::cFragShaderExtension))
-                {
-                    std::cout << entry.path() << std::endl;
-                    msShaderPaths.push_back(entry.path().c_str());
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at shaderlist: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at shaderlist: " << e.what() << std::endl;
-        }
-    }
-    else
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cShadersPath))
-            {
-                if ((entry.is_regular_file() && entry.path().extension() == core::cVertShaderExtension) || (entry.is_regular_file() && entry.path().extension() == core::cFragShaderExtension))
-                {
-                    for (GLuint i = 0; i < msShaderPaths.size(); i++)
-                    {
-                        if (msShaderPaths.at(i) == std::string(entry.path()))
-                        {
-                            std::cout << "SAME " << std::endl;
-                            break;
-                        }
-                        else if ((i == core::MainHandler::msShaderPaths.size() - 1) &&
-                                 (core::MainHandler::msShaderPaths.at(i) != std::string(entry.path())))
-                        {
-                            msShaderPaths.push_back(std::string(entry.path()));
-                        }
-                    }
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at shaderList : " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at shaderList : " << e.what() << std::endl;
-        }
-    }
-}
-
-void core::MainHandler::loadAllModels()
-{
-    // the first load
-    if (core::MainHandler::msObjectModels.size() == 0)
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cModelsPath))
-            {
-                if ((entry.is_regular_file() && entry.path().extension() == core::cModelObjExtension) ||
-                    (entry.is_regular_file() && entry.path().extension() == core::cModelFBXExtension))
-                {
-                    std::cout << entry.path() << std::endl;
-                    core::MainHandler::msObjectModels.push_back(std::make_unique<Model::Model>(std::string(entry.path())));
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at loadModels: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at loadModels: " << e.what() << std::endl;
-        }
-    }
-    // second load
-    else
-    {
-        try
-        {
-            for (const auto &entry : std::filesystem::recursive_directory_iterator(core::cModelsPath))
-            {
-                if ((entry.is_regular_file() && entry.path().extension() == core::cModelObjExtension) ||
-                    (entry.is_regular_file() && entry.path().extension() == core::cModelFBXExtension))
-                {
-                    for (GLuint i = 0; i < core::MainHandler::msObjectModels.size(); i++)
-                    {
-                        if (core::MainHandler::msObjectModels.at(i).get()->directory == std::string(entry.path().parent_path()))
-                        {
-                            std::cout << "SAME " << std::endl;
-                            break;
-                        }
-                        else if ((i == core::MainHandler::msObjectModels.size() - 1) &&
-                                 (core::MainHandler::msObjectModels.at(i).get()->directory != std::string(entry.path().parent_path())))
-                        {
-                            core::MainHandler::msObjectModels.push_back(std::make_unique<Model::Model>(std::string(entry.path())));
-                        }
-                    }
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Filesystem error at loadModels: " << e.what() << std::endl;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "General error at loadModels: " << e.what() << std::endl;
-        }
-    }
-}
-
-void core::MainHandler::saveSceneAsJson(std::string inputFileName, GLboolean overwriteOption)
-{
-    std::string fullPath = cJsonScenesPath + inputFileName + cJsonExtension;
-
-    // Stops if filename exists takes overwriteOption as parameter
-    if (std::filesystem::exists(fullPath) && overwriteOption == false)
-    {
-        std::cerr << "File already exists (core::MainHandler::saveSceneAsJson) !" << std::endl;
-        throw std::invalid_argument("FILE::EXIST");
-    }
-
-    std::filesystem::path filePath = fullPath;
-
-    // Deletes if filename exist uses overwriteoption as parameter
-    if (std::filesystem::exists(fullPath) && overwriteOption == true)
-    {
-        try
-        {
-            if (std::filesystem::remove(filePath))
-            {
-                std::cout << "File deleted successfully.\n";
-            }
-            else
-            {
-                std::cout << "File does not exist.\n";
-            }
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cerr << "Error: " << e.what() << '\n';
-        }
-    }
-
-    // Saves the file
-    std::ofstream file(fullPath);
-    if (file.is_open())
-    {
-        GLuint count = 0;
-        nlohmann::json newJsonFile;
-
-        // Saves models here
-        for (GLuint i = 0; i < core::MainHandler::msObjectModels.size(); i++)
-        {
-            nlohmann::json modelJson;
-            modelJson["Path"] = core::MainHandler::msObjectModels.at(i).get()->path;
-            newJsonFile["Models"].push_back(modelJson);
-            count = i + 1;
-        }
-        newJsonFile["Model Count"] = count;
-        count = 0;
-
-        // Saves Shaders Here
-        for (GLuint i = 0; i < core::MainHandler::msShaders.size(); i++)
-        {
-            nlohmann::json shaderJson;
-            shaderJson["FragPath"] = core::MainHandler::msShaders.at(i).get()->fragmentPath.c_str();
-            shaderJson["VertPath"] = core::MainHandler::msShaders.at(i).get()->vertexPath.c_str();
-            newJsonFile["Shaders"].push_back(shaderJson);
-            count = i + 1;
-        }
-        newJsonFile["Shader Count"] = count;
-        count = 0;
-
-        // Saves Entities here
-        for (GLuint i = 0; i < core::MainHandler::msEntities.size(); i++)
-            newJsonFile["Entities"].push_back(core::MainHandler::msEntities.at(i).get()->saveAsJson()), count = i + 1;
-        newJsonFile["Entity Count"] = count;
-        count = 0;
-
-        // Saves Lights here
-        for (GLuint i = 0; i < core::MainHandler::msLights.size(); i++)
-            newJsonFile["Lights"].push_back(core::MainHandler::msLights.at(i).get()->saveAsJson()), count = i + 1;
-        newJsonFile["Light Count"] = count;
-        count = 0;
-
-        std::string jsonString = newJsonFile.dump(1);
-        file << jsonString;
-        file.close();
-    }
-    else
-    {
-        std::cerr << "Could not create file (core::MainHandler::saveSceneAsJson)" << std::endl;
-        throw std::invalid_argument("SYSTEM::ERROR");
-    }
-}
-
-void core::MainHandler::loadSceneFromJson(std::string filename)
-{
-    nlohmann::json *newJsonPtr = core::JsonExtractor::loadJsonFromPath(core::cJsonScenesPath + filename + cJsonExtension);
-    nlohmann::json newJson = *newJsonPtr;
-    
-    std::cout << core::cJsonScenesPath + filename + cJsonExtension << std::endl;
-    std::cout << newJson.dump(4);
-
-    delete newJsonPtr;
-    newJsonPtr = nullptr;
-
-    core::MainHandler::msShaders.clear();
-    core::MainHandler::msLights.clear();
-    core::MainHandler::msObjectModels.clear();
-    core::MainHandler::msEntities.clear();
-
-    GLuint entityCount = newJson["Entity Count"].get<GLuint>();
-    GLuint modelCount = newJson["Model Count"].get<GLuint>();
-    GLuint lightCount = newJson["Light Count"].get<GLuint>();
-    GLuint shaderCount = newJson["Shader Count"].get<GLuint>();
-
-    std::cout << "Loading shaders" << std::endl;
-    for (GLuint i = 0; i < shaderCount; i++)
-    {
-        std::string vertPath = newJson["Shaders"][i]["VertPath"].get<std::string>();
-        std::string fragPath = newJson["Shaders"][i]["FragPath"].get<std::string>();
-        Shader *newShader = new Shader(vertPath.c_str(), fragPath.c_str());
-        core::MainHandler::msShaders.push_back(std::unique_ptr<Shader>(newShader));
-        newShader = nullptr;
-    }
-
-    std::cout << "Loading lights" << std::endl;
-    for (GLuint i = 0; i < lightCount; i++)
-    {
-        Model::Light *newLight = new Model::Light();
-
-        newLight->light_color.x = newJson["Lights"][i]["Light Color"][0].get<GLfloat>();
-        newLight->light_color.y = newJson["Lights"][i]["Light Color"][1].get<GLfloat>();
-        newLight->light_color.z = newJson["Lights"][i]["Light Color"][2].get<GLfloat>();
-
-        newLight->light_pos.x = newJson["Lights"][i]["Light Position"][0].get<GLfloat>();
-        newLight->light_pos.y = newJson["Lights"][i]["Light Position"][1].get<GLfloat>();
-        newLight->light_pos.z = newJson["Lights"][i]["Light Position"][2].get<GLfloat>();
-
-        newLight->ambient = newJson["Lights"][i]["Ambient"].get<GLfloat>();
-        newLight->diffuse = newJson["Lights"][i]["Diffuse"].get<GLfloat>();
-        newLight->specular = newJson["Lights"][i]["Specular"].get<GLfloat>();
-
-        core::MainHandler::msLights.push_back(std::unique_ptr<Model::Light>(newLight));
-        newLight = nullptr;
-    }
-
-    std::cout << "Loading models" << std::endl;
-    for (GLuint i = 0; i < modelCount; i++)
-    {
-        Model::Model *newModel = new Model::Model(newJson["Models"][i]["Path"].get<std::string>());
-        core::MainHandler::msObjectModels.push_back(std::unique_ptr<Model::Model>(newModel));
-        newModel = nullptr;
-    }
-
-    std::cout << "Loading entities" << std::endl;
-    for (GLuint i = 0; i < entityCount; i++)
-    {
-        core::CoreEntity *newEntity = new CoreEntity();
-        newEntity->mPos.x = newJson["Entities"][i]["Pos vector"][0].get<GLfloat>();
-        newEntity->mPos.y = newJson["Entities"][i]["Pos vector"][1].get<GLfloat>();
-        newEntity->mPos.z = newJson["Entities"][i]["Pos vector"][2].get<GLfloat>();
-
-        newEntity->mRotAxis.x = newJson["Entities"][i]["Rot vector"][0].get<GLfloat>();
-        newEntity->mRotAxis.y = newJson["Entities"][i]["Rot vector"][1].get<GLfloat>();
-        newEntity->mRotAxis.z = newJson["Entities"][i]["Rot vector"][2].get<GLfloat>();
-
-        newEntity->mRotDegreeRad = newJson["Entities"][i]["Rot degree"].get<GLfloat>();
-
-        newEntity->mModelScale.x = newJson["Entities"][i]["Model Scale"][0].get<GLfloat>();
-        newEntity->mModelScale.y = newJson["Entities"][i]["Model Scale"][1].get<GLfloat>();
-        newEntity->mModelScale.z = newJson["Entities"][i]["Model Scale"][2].get<GLfloat>();
-
-        for (GLuint j = 0; j < core::MainHandler::msObjectModels.size(); j++)
-        {
-            if (newJson["Entities"][i]["Model Path"].get<std::string>() == core::MainHandler::msObjectModels.at(j).get()->path)
-            {
-                newEntity->mpModel = core::MainHandler::msObjectModels.at(j).get();
-                break;
-            }
-            else
-            {
-                continue;
-            }
-        }
-        core::MainHandler::msEntities.push_back(std::unique_ptr<core::CoreEntity>(newEntity));
-        newEntity = nullptr;
-    }
-    std::cout << "Loaded save succelsadqfully !" << std::endl;
-}
 
 // Runtime related functions
-
 void core::MainHandler::addCoreEntity()
 {
     CoreEntity *newCoreEntity = new CoreEntity();
@@ -809,9 +329,9 @@ void core::MainHandler::addCoreEntity(Model::Model *entityModel)
     newCoreEntity = nullptr;
 }
 
-// System related functions
 
-// Also handles camera
+
+// System related functions
 void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
 {
     // wait time for pressing esc
@@ -851,7 +371,6 @@ void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
-
     // decreases wait time
     if (waitTime - deltaTime <= 0) // somehow
         waitTime = 0;

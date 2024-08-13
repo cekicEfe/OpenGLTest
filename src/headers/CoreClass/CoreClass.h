@@ -1,9 +1,11 @@
 #ifndef CORECLASS_H
 #define CORECLASS_H
 
-//Further declaretion for dependant classes
+//Further decleration? for dependant classes
 namespace core
 {
+    class JsonExtractor;
+    class SaveLoadHandler;
     class RenderFunctor;
     class CoreEntity;
     class MainHandler;

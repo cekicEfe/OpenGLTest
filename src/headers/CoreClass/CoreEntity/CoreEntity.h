@@ -16,7 +16,8 @@ namespace core
 		CoreEntity();
 	    virtual ~CoreEntity();
 		virtual nlohmann::json saveAsJson();
-	protected:
+		virtual void update(GLfloat deltaTime);
+
 		Model::Model *mpModel = nullptr;
 		glm::vec3 mModelScale = glm::vec3(1.0f);
 
@@ -24,8 +25,6 @@ namespace core
 
 		glm::vec3 mRotAxis = glm::vec3(1.0f,0.0f,0.0f);
 		GLfloat mRotDegreeRad = 0;
-
-		virtual void update(GLfloat deltaTime);
 
 		friend class core::MainHandler;
 		friend class core::RenderFunctor;

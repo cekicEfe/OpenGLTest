@@ -10,7 +10,8 @@
 #include <CoreClass/CoreClass.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
 #include <CoreClass/RenderFunctor/RenderFunctor.h>
-#include <CoreClass/JsonExtractor/JsonExtractor.h>
+#include <CoreClass/MainHandler/SystemHeaders/JsonExtractor/JsonExtractor.h>
+#include <CoreClass/MainHandler/SystemHeaders/SaveLoadHandler/SaveLoadHandler.h>
 
 #include <json/json.hpp>
 #include <filesystem>
@@ -44,26 +45,18 @@ namespace core
         static std::vector<std::unique_ptr<core::CoreEntity>> msEntities;
         static std::map<Model::Model*,std::vector<core::CoreEntity*>> msModelEntityMap;
 
+        static std::vector<std::string> msShaderPaths;
+        static std::vector<std::string> msJsonPreceptPaths;
+        static std::vector<std::string> msJsonScenePaths;
+
         static std::vector<std::unique_ptr<nlohmann::json>> msJsonScenes;
         static std::vector<std::unique_ptr<nlohmann::json>> msJsonPrecepts;
         static std::vector<std::unique_ptr<Model::Light>> msLights;
         static std::vector<std::unique_ptr<Shader>> msShaders;
 
-        //these hold just path
-        static std::vector<std::string> msShaderPaths;
-        static std::vector<std::string> msJsonPreceptPaths;
-        static std::vector<std::string> msJsonScenePaths;
-
         static void addCoreEntity();
         static void addCoreEntity(Model::Model* entityModel);
         
-        static void loadAllScenePaths();
-        static void loadAllShaderPaths();
-        static void loadAllJsonPrecepts();
-        static void loadAllJsonPreceptPath();
-        static void loadAllModels();
-        
-
     public:
         MainHandler();
         ~MainHandler();
@@ -72,9 +65,6 @@ namespace core
         static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
         static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
         static void processInput(GLFWwindow *window, GLfloat deltaTime);
-
-        static void saveSceneAsJson(std::string fileName , GLboolean overwriteOption);
-        static void loadSceneFromJson(std::string filename);
 
         static void DrawInstanced();
         static void DrawInstancedWithInterval(GLfloat deltaTime,GLfloat intervalMS);

@@ -11,10 +11,11 @@ namespace core
 {
     class JsonExtractor
     {
-    protected:
+    public:
         static nlohmann::json *loadJsonFromPath(std::string path);
 
         friend class core::MainHandler;
+        friend class core::SaveLoadHandler;
     };
 }
 
