@@ -218,6 +218,7 @@ void core::MainHandler::showGui()
         }
         ImGui::EndGroup();
 
+        /*
         ImGui::BeginGroup();
         if (ImGui::CollapsingHeader("Json precept config"))
         {
@@ -251,6 +252,7 @@ void core::MainHandler::showGui()
             ImGui::EndGroup();
         }
         ImGui::EndGroup();
+        */
 
         ImGui::BeginGroup();
         if (ImGui::CollapsingHeader("Save/Load config"))

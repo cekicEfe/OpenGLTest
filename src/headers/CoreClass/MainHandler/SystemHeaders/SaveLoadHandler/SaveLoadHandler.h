@@ -19,13 +19,14 @@ namespace core
     class SaveLoadHandler
     {
     public:
-
         static void loadAllJsonScenePaths(std::vector<std::string> *JsonScenePaths);
-        static void loadAllShaderPaths(std::vector<std::string> *ShaderPaths);
         static void loadAllJsonPreceptPath(std::vector<std::string> *JsonPreceptPaths);
+        static void loadAllShaderPaths(std::vector<std::string> *ShaderPaths);
+
 
         static void loadAllJsonPrecepts(std::vector<std::unique_ptr<nlohmann::json>> *JsonPrecepts);
         static void loadAllModels(std::vector<std::unique_ptr<Model::Model>> *ObjectModels);
+
 
         static void saveSceneAsJson(std::string fileName,
                                     GLboolean overwriteOption,

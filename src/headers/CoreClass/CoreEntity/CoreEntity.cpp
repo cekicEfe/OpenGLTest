@@ -28,6 +28,7 @@ nlohmann::json core::CoreEntity::saveAsJson()
                                 this->mModelScale.z};
 
   newJsonFile["Type"] = "CoreEntity";
+  newJsonFile["Entity ID"] = std::to_string((int)this);//Dont touch this until it somehow break something (which is probable?)
 
   return newJsonFile;
 }

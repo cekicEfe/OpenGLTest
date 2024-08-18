@@ -9,6 +9,7 @@ namespace core
     class RenderFunctor;
     class CoreEntity;
     class MainHandler;
+    class HitBox;
 }
 
 #endif
