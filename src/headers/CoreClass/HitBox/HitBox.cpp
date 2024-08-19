@@ -67,6 +67,7 @@ void core::HitBox::GenerateHitbox()
             this->mRearPos = rear;
             this->mLeftPos = left;
             this->mRightPos = right;
+
         }
         else
         {
@@ -93,4 +94,6 @@ nlohmann::json core::HitBox::SaveAsJson()
         newJson["Left "] = {this->mLeftPos.x, this->mLeftPos.y, this->mLeftPos.z};
         newJson["Right"] = {this->mRightPos.x, this->mRightPos.y, this->mRightPos.z};
     }
+
+    return newJson;
 }
