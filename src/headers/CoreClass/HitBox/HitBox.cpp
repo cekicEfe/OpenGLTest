@@ -84,7 +84,7 @@ nlohmann::json core::HitBox::SaveAsJson()
 {
     nlohmann::json newJson;
 
-    newJson["Bound Entity ID"] = std::to_string((int)this->mConnectedEntity); // Sucks so bad :(
+    //newJson["Bound Entity ID"] = std::to_string((int)this->mConnectedEntity); // Sucks so bad :(
     if (this->mConnectedEntity != nullptr)
     {
         newJson["Top  "] = {this->mTopPos.x, this->mTopPos.y, this->mTopPos.z};

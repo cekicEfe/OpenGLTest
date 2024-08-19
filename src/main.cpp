@@ -92,6 +92,10 @@ int main(int argc, char** argv)
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();
 
+    {
+    ImGui::Begin("HElllow");
+    ImGui::End();
+    }
     // Show gui
     core::MainHandler::showGui();
 
