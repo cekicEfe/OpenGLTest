@@ -22,6 +22,7 @@
 #include <iostream>
 #include <filesystem>
 
+
 int main(int argc, char** argv)
 {
   // initilizes glfw
@@ -29,6 +30,7 @@ int main(int argc, char** argv)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  
   //For antialising
   glfwWindowHint(GLFW_SAMPLES, 4);
 
@@ -65,7 +67,6 @@ int main(int argc, char** argv)
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
   ImGui_ImplOpenGL3_Init();
-
 
   // sets rand seed
   srand(time(NULL));
