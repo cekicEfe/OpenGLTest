@@ -1,7 +1,7 @@
 #ifndef COREOBJECT_H
 #define COREOBJECT_H
 
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <json/json.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <model/Model.h>
@@ -27,7 +27,7 @@ namespace core
 		GLfloat mRotDegreeRad = 0;
 
 		friend class core::MainHandler;
-		friend class core::RenderFunctor;
+		friend class core::RenderHandler;
 	};
 }
 #endif // !SCRIPTOBJECT

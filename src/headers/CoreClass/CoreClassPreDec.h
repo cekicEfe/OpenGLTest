@@ -6,10 +6,11 @@ namespace core
 {
     class JsonExtractor;
     class SaveLoadHandler;
-    class RenderFunctor;
+    class RenderHandler;
     class CoreEntity;
     class MainHandler;
     class HitBox;
+    class CollisionDetector;
 }
 
 #endif

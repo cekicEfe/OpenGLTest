@@ -382,7 +382,7 @@ void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
 
 void core::MainHandler::DrawInstanced()
 {
-    core::RenderFunctor::DrawInstanced(
+    core::RenderHandler::DrawInstanced(
         core::MainHandlerVariables.SCR_WIDTH,
         core::MainHandlerVariables.SCR_HEIGHT,
         &core::MainHandler::msShaders,

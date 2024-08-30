@@ -1,7 +1,7 @@
 #ifndef TESTHITBOX_H
 #define TESTHITBIX_H
 
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
 
 namespace core

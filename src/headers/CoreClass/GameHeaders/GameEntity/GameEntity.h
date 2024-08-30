@@ -1,7 +1,7 @@
 #ifndef GAMEENTITY_H
 #define GAMEENTITY_H
 
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
 
 namespace TestGame 

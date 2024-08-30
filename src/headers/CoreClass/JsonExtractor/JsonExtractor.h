@@ -2,7 +2,7 @@
 #define JSONEXTRACTOR_H
 
 #include <json/json.hpp>
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <string>
 #include <iostream>
 #include <fstream>

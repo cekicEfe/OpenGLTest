@@ -1,17 +1,17 @@
-#include "CoreClass/RenderFunctor/RenderFunctor.h"
+#include "CoreClass/RenderHandler/RenderHandler.h"
 
 
-core::RenderFunctor::RenderFunctor()
+core::RenderHandler::RenderHandler()
 {
   std::cout << "Called RenderFunctor Constructor" << std::endl;
 }
 
-core::RenderFunctor::~RenderFunctor()
+core::RenderHandler::~RenderHandler()
 {
   std::cout << "Called RenderFunctor DEconstructor" << std::endl;
 }
 
-void core::RenderFunctor::DrawInstanced(
+void core::RenderHandler::DrawInstanced(
     float SCR_WIDTH,
     float SCR_HEIGHT,
     std::vector<std::unique_ptr<Shader>>* shader,

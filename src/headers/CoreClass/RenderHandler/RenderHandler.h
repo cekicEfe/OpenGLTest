@@ -1,7 +1,7 @@
-#ifndef RENDERFUNCTOR_H
-#define RENDERFUNCTOR_H
+#ifndef RENDERHANDLER_H
+#define RENDERHANDLER_H
 
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
 
 #include <model/Shaders.h>
@@ -12,11 +12,11 @@
 
 namespace core
 {
-  class RenderFunctor
+  class RenderHandler
   {
   private:
-    RenderFunctor();
-    ~RenderFunctor();
+    RenderHandler();
+    ~RenderHandler();
 
     void static DrawInstanced(float width,
                               float height,

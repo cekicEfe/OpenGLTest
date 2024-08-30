@@ -7,11 +7,11 @@
 #include <model/Model.h>
 #include <model/Shaders.h>
 
-#include <CoreClass/CoreClass.h>
+#include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
-#include <CoreClass/RenderFunctor/RenderFunctor.h>
-#include <CoreClass/MainHandler/SystemHeaders/JsonExtractor/JsonExtractor.h>
-#include <CoreClass/MainHandler/SystemHeaders/SaveLoadHandler/SaveLoadHandler.h>
+#include <CoreClass/RenderHandler/RenderHandler.h>
+#include <CoreClass/JsonExtractor/JsonExtractor.h>
+#include <CoreClass/SaveLoadHandler/SaveLoadHandler.h>
 
 #include <json/json.hpp>
 #include <filesystem>
