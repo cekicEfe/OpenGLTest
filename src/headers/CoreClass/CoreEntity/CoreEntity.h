@@ -2,32 +2,26 @@
 #define COREOBJECT_H
 
 #include <CoreClass/CoreClassPreDec.h>
-#include <json/json.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <json/json.hpp>
+#include <memory>
 #include <model/Model.h>
 #include <vector>
-#include <memory>
 
-namespace core
-{
-	class CoreEntity
-	{
-	public:
-		CoreEntity();
-	    virtual ~CoreEntity();
-		virtual nlohmann::json saveAsJson();
-		virtual void update(GLfloat deltaTime);
+namespace core {
+class CoreEntity {
+public:
+  CoreEntity();
+  virtual ~CoreEntity();
 
-		Model::Model *mpModel = nullptr;
-		glm::vec3 mModelScale = glm::vec3(1.0f);
+  virtual nlohmann::json saveAsJson();
+  virtual void update(GLfloat deltaTime);
 
-		glm::vec3 mPos = glm::vec3(0.0f);
-
-		glm::vec3 mRotAxis = glm::vec3(1.0f,0.0f,0.0f);
-		GLfloat mRotDegreeRad = 0;
-
-		friend class core::MainHandler;
-		friend class core::RenderHandler;
-	};
-}
+  Model::Model *model = nullptr;
+  glm::vec3 modelScale = glm::vec3(1.0f);
+  glm::vec3 pos = glm::vec3(0.0f);
+  glm::vec3 rotAxis = glm::vec3(1.0f, 0.0f, 0.0f);
+  GLfloat rotDegreeRad = 0;
+};
+} // namespace core
 #endif // !SCRIPTOBJECT
