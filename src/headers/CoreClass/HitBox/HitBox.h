@@ -1,12 +1,12 @@
 #ifndef TESTHITBOX_H
-#define TESTHITBIX_H
+#define TESTHITBOX_H
 
 #include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
 
 namespace core {
 class HitBox {
-private:
+public:
   CoreEntity *mConnectedEntity = nullptr;
 
   glm::vec3 mTopPos;
@@ -18,9 +18,6 @@ private:
 
   void AttachEntity(CoreEntity *entity);
   void GenerateHitbox();
-
-  friend class core::MainHandler;
-  nlohmann::json SaveAsJson();
 };
 } // namespace core
 

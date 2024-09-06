@@ -21,8 +21,9 @@ public:
       float width, float height, Camera *camera = NULL,
       std::vector<std::unique_ptr<Shader>> *shader = NULL,
       std::vector<std::unique_ptr<Model::Light>> *lights = NULL,
-      std::unordered_map<std::vector<std::shared_ptr<Model::Model>>,
-                         std::vector<std::shared_ptr<CoreEntity>>> *map = NULL);
+      std::unordered_map<Model::Model *,
+                         std::vector<std::unique_ptr<core::CoreEntity>>> *map =
+          NULL);
 };
 } // namespace core
 

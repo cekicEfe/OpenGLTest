@@ -74,22 +74,3 @@ void core::HitBox::GenerateHitbox() {
     std::cout << "No connected entity" << std::endl;
   }
 }
-
-nlohmann::json core::HitBox::SaveAsJson() {
-  nlohmann::json newJson;
-
-  // newJson["Bound Entity ID"] = std::to_string((int)this->mConnectedEntity);
-  // // Sucks so bad :(
-  if (this->mConnectedEntity != nullptr) {
-    newJson["Top  "] = {this->mTopPos.x, this->mTopPos.y, this->mTopPos.z};
-    newJson["Bot  "] = {this->mBotPos.x, this->mBotPos.y, this->mBotPos.z};
-    newJson["Front"] = {this->mFrontPos.x, this->mFrontPos.y,
-                        this->mFrontPos.z};
-    newJson["Rear "] = {this->mRearPos.x, this->mRearPos.y, this->mRearPos.z};
-    newJson["Left "] = {this->mLeftPos.x, this->mLeftPos.y, this->mLeftPos.z};
-    newJson["Right"] = {this->mRightPos.x, this->mRightPos.y,
-                        this->mRightPos.z};
-  }
-
-  return newJson;
-}

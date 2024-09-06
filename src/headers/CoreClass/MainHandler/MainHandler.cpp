@@ -1,9 +1,10 @@
 #include "MainHandler.h"
+#include <memory>
+#include <vector>
 
-std::vector<std::unique_ptr<core::CoreEntity>> core::MainHandler::msEntities;
-std::vector<std::unique_ptr<Model::Model>> core::MainHandler::msObjectModels;
-std::map<Model::Model *, std::vector<core::CoreEntity *>>
-    core::MainHandler::msModelEntityMap;
+std::unordered_map<std::unique_ptr<Model::Model>,
+                   std::vector<std::shared_ptr<core::CoreEntity>>>
+    core::MainHandler::msEntityBatch;
 
 std::vector<std::string> core::MainHandler::msJsonScenePaths;
 std::vector<std::string> core::MainHandler::msJsonPreceptPaths;
@@ -19,18 +20,9 @@ std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonPrecepts;
 void core::MainHandler::showGui() {}
 
 // Runtime related functions
-void core::MainHandler::addCoreEntity() {
-  CoreEntity *newCoreEntity = new CoreEntity();
-  core::MainHandler::msEntities.emplace_back(newCoreEntity);
-}
+void core::MainHandler::addCoreEntity() {}
 
-void core::MainHandler::addCoreEntity(Model::Model *entityModel) {
-  CoreEntity *newCoreEntity = new CoreEntity();
-  newCoreEntity->model = entityModel;
-  core::MainHandler::msEntities.push_back(
-      std::unique_ptr<CoreEntity>(newCoreEntity));
-  newCoreEntity = nullptr;
-}
+void core::MainHandler::addCoreEntity(Model::Model *entityModel) {}
 
 // System related functions
 void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime) {

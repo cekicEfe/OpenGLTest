@@ -1,6 +1,7 @@
 #ifndef MAINHANDLER_H
 #define MAINHANDLER_H
 
+#include <memory>
 #include <model/Camera.h>
 #include <model/Model.h>
 #include <model/Shaders.h>
@@ -15,6 +16,7 @@
 #include <filesystem>
 #include <imgui/imgui.h>
 #include <json/json.hpp>
+#include <unordered_map>
 #include <vector>
 
 namespace core {
@@ -34,12 +36,17 @@ private:
   friend class MainHandler;
 } static MainHandlerVariables;
 
+template <typename t, typename path>
+class model_shared_pointer : public std::shared_ptr<t> {
+public:
+  path depot;
+};
+
 class MainHandler {
 private:
-  static std::vector<std::unique_ptr<Model::Model>> msObjectModels;
-  static std::vector<std::unique_ptr<core::CoreEntity>> msEntities;
-  static std::map<Model::Model *, std::vector<core::CoreEntity *>>
-      msModelEntityMap;
+  static std::unordered_map<model_shared_pointer<Model::Model, std::string>,
+                            std::vector<std::shared_ptr<core::CoreEntity>>>
+      msEntityBatch;
 
   static std::vector<std::string> msShaderPaths;
   static std::vector<std::string> msJsonPreceptPaths;
