@@ -1,10 +1,12 @@
 #include "CoreClass/RenderHandler/RenderHandler.h"
 
-core::RenderHandler::RenderHandler() {
+core::RenderHandler::RenderHandler()
+{
   std::cout << "Called RenderFunctor Constructor" << std::endl;
 }
 
-core::RenderHandler::~RenderHandler() {
+core::RenderHandler::~RenderHandler()
+{
   std::cout << "Called RenderFunctor DEconstructor" << std::endl;
 }
 
@@ -12,10 +14,14 @@ void core::RenderHandler::DrawInstanced(
     float SCR_WIDTH, float SCR_HEIGHT, Camera *camera,
     std::vector<std::unique_ptr<Shader>> *shader,
     std::vector<std::unique_ptr<Model::Light>> *lightSources,
-    std::unordered_map<Model::Model *,
-                       std::vector<std::unique_ptr<core::CoreEntity>>> *map) {
+    std::unordered_map<std::string,
+                       std::pair<std::unique_ptr<Model::Model>,
+                                 std::vector<std::shared_ptr<core::CoreEntity>>>>
+        *map)
+{
   if (shader != NULL && camera != NULL && lightSources != NULL && map != NULL &&
-      (shader->size() > 0) && (lightSources->size() > 0) && (map->size() > 0)) {
+      (shader->size() > 0) && (lightSources->size() > 0) && (map->size() > 0))
+  {
 
     // creates a temporary main vector that takes from input
     Shader *localShader = shader->at(0).get();
@@ -24,11 +30,13 @@ void core::RenderHandler::DrawInstanced(
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, CLOSE_SIGHT,
         FAR_SIGHT);
+
     glm::mat4 view = camera->GetViewMatrix();
     localShader->setInt("texture_diffuse1", 0);
     localShader->setFloat("time", glfwGetTime());
     localShader->setInt("light_count", lightSources->size());
-    for (GLuint i = 0; i < lightSources->size(); i++) {
+    for (GLuint i = 0; i < lightSources->size(); i++)
+    {
       localShader->setVec3("light_positions[" + std::to_string(i) + "]",
                            lightSources->at(i)->light_pos);
       localShader->setVec3("light_colors[" + std::to_string(i) + "]",
@@ -37,21 +45,25 @@ void core::RenderHandler::DrawInstanced(
     localShader->setMat4("projection", projection);
     localShader->setMat4("view", view);
 
-    for (GLuint i = 0; i < map->size(); i++) {
-      if (map->size() > 0 && map.!= NULL) {
+    for (auto &elem : *map)
+    {
+      if (map != NULL && elem.second.second.size() > 0)
+      {
         glm::mat4 *modelMatrices;
-        modelMatrices = new glm::mat4[iVectorSize];
+        modelMatrices = new glm::mat4[elem.second.second.size()];
         glm::mat4 modelMat = glm::mat4(1.0f);
+
+        auto currentVecSize = elem.second.second.size();
 
         // Loads Matrices
         // MIND THE ROTATION
-        for (size_t j = 0; j < iVectorSize; j++) {
-          modelMat = glm::translate(modelMat, mainVector.at(i).at(j)->mPos);
-          modelMat = glm::scale(modelMat, mainVector.at(i).at(j)->mModelScale);
-          modelMat =
-              glm::rotate(modelMat, mainVector.at(i).at(j)->mRotDegreeRad,
-                          mainVector.at(i).at(j)->mRotAxis);
-          modelMatrices[j] = modelMat; // NO ITS NOT ?
+        for (size_t j = 0; j < currentVecSize; j++)
+        {
+          modelMat = glm::translate(modelMat, elem.second.second.at(j)->pos);
+          modelMat = glm::scale(modelMat, elem.second.second.at(j)->modelScale);
+          modelMat = glm::rotate(modelMat, elem.second.second.at(j)->rotDegreeRad,
+                                 elem.second.second.at(j)->rotAxis);
+          modelMatrices[j] = modelMat;
           modelMat = glm::mat4(1.0f);
         }
 
@@ -59,13 +71,14 @@ void core::RenderHandler::DrawInstanced(
         GLuint buffer;
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ARRAY_BUFFER, iVectorSize * sizeof(glm::mat4),
+        glBufferData(GL_ARRAY_BUFFER, currentVecSize * sizeof(glm::mat4),
                      &modelMatrices[0], GL_STATIC_DRAW);
 
         // Buffers objects meshes
-        for (GLuint j = 0; j < mainVector.at(i).at(0)->model->Meshes.size();
-             j++) {
-          GLuint VAO = mainVector.at(i).at(0)->model->Meshes[j].vao.id;
+        for (GLuint j = 0; j < elem.second.first->Meshes.size();
+             j++)
+        {
+          GLuint VAO = elem.second.first->Meshes[j].vao.id;
           glBindVertexArray(VAO);
 
           glEnableVertexAttribArray(4);
@@ -91,33 +104,29 @@ void core::RenderHandler::DrawInstanced(
 
         // Draws objects here
         localShader->use();
-        for (GLuint g = 0; g < mainVector.at(i).at(0)->model->Meshes.size();
-             g++) {
-          if (mainVector.at(i).at(0)->model->HasTexture()) {
+        for (GLuint g = 0; g < elem.second.first->Meshes.size();
+             g++)
+        {
+          if (elem.second.first->HasTexture())
+          {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D,
-                          mainVector.at(i).at(0)->model->Textures.at(0).ID);
+                          elem.second.first->Textures.at(0).ID);
           }
-          glBindVertexArray(mainVector.at(i).at(0)->model->Meshes.at(g).vao.id);
+          glBindVertexArray(elem.second.first->Meshes.at(g).vao.id);
           glDrawElementsInstanced(
               GL_TRIANGLES,
               static_cast<GLuint>(
-                  mainVector.at(i).at(0)->model->Meshes.at(g).indices.size()),
-              GL_UNSIGNED_INT, 0, iVectorSize);
+                  elem.second.first->Meshes.at(g).indices.size()),
+              GL_UNSIGNED_INT, 0, currentVecSize);
           glBindVertexArray(0);
         }
 
         // To free the memory at the CUDA I guess ?
         glDeleteBuffers(1, &buffer);
+
         // To not leak memory
         delete[] modelMatrices;
-      }
-    }
-
-    // Gets rid of pointers
-    for (unsigned int i = 0; i < mainVectorSize; i++) {
-      for (unsigned int j = 0; j < mainVector.at(i).size(); j++) {
-        mainVector.at(i).at(j) = NULL;
       }
     }
   }

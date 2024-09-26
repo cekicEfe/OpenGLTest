@@ -17,7 +17,6 @@ public:
   virtual nlohmann::json saveAsJson();
   virtual void update(GLfloat deltaTime);
 
-  Model::Model *model = nullptr;
   glm::vec3 modelScale = glm::vec3(1.0f);
   glm::vec3 pos = glm::vec3(0.0f);
   glm::vec3 rotAxis = glm::vec3(1.0f, 0.0f, 0.0f);

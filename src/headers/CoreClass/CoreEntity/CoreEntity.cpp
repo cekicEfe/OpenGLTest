@@ -6,4 +6,4 @@ nlohmann::json core::CoreEntity::saveAsJson() {}
 
 core::CoreEntity::CoreEntity() {}
 
-core::CoreEntity::~CoreEntity() { this->model = nullptr; }
+core::CoreEntity::~CoreEntity() {}

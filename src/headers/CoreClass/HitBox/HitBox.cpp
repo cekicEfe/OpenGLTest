@@ -1,13 +1,17 @@
 #include "HitBox.h"
 
-void core::HitBox::AttachEntity(CoreEntity *entity) {
+void core::HitBox::AttachEntity(CoreEntity *entity)
+{
   this->mConnectedEntity = entity;
 }
 
 // Generates a Hitbox by sort throughghhg nodes which kind of sucks
-void core::HitBox::GenerateHitbox() {
-  if (this->mConnectedEntity != nullptr) {
-    if (this->mConnectedEntity->model != nullptr) {
+void core::HitBox::GenerateHitbox()
+{
+  if (this->mConnectedEntity != nullptr)
+  {
+    if (this->mConnectedEntity->model != nullptr)
+    {
       //(probable) extreme points of the model
 
       //                       +y       -z
@@ -38,10 +42,12 @@ void core::HitBox::GenerateHitbox() {
       glm::vec3 right(0.0f, 0.0f, 0.0f); //+x
 
       for (GLuint i = 0; i < this->mConnectedEntity->model->Meshes.size();
-           i++) {
+           i++)
+      {
         for (GLuint j = 0;
              j < this->mConnectedEntity->model->Meshes.at(i).vertices.size();
-             j++) {
+             j++)
+        {
           auto pos = this->mConnectedEntity->model->Meshes.at(i)
                          .vertices.at(j)
                          .position;
@@ -66,11 +72,14 @@ void core::HitBox::GenerateHitbox() {
       this->mRearPos = rear;
       this->mLeftPos = left;
       this->mRightPos = right;
-
-    } else {
+    }
+    else
+    {
       std::cout << "Entity has no model" << std::endl;
     }
-  } else {
+  }
+  else
+  {
     std::cout << "No connected entity" << std::endl;
   }
 }

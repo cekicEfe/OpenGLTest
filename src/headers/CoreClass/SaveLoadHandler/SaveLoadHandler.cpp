@@ -1,5 +1,5 @@
 #include "SaveLoadHandler.h"
-
+/*
 void core::SaveLoadHandler::loadAllJsonPreceptPath(
     std::vector<std::string> *JsonPreceptPaths) {
   if (JsonPreceptPaths->size() == 0) {
@@ -434,3 +434,4 @@ void core::SaveLoadHandler::loadSceneFromJson(
   }
   std::cout << "Loaded save succelsadqfully !" << std::endl;
 }
+*/
