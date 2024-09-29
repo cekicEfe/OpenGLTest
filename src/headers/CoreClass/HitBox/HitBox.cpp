@@ -1,13 +1,12 @@
 #include "HitBox.h"
 
-void core::HitBox::AttachEntity(CoreEntity *entity)
-{
+void core::HitBox::AttachEntity(CoreEntity *entity) {
   this->mConnectedEntity = entity;
 }
 
 // Generates a Hitbox by sort throughghhg nodes which kind of sucks
-void core::HitBox::GenerateHitbox()
-{
+void core::HitBox::GenerateHitbox() {
+  /*
   if (this->mConnectedEntity != nullptr)
   {
     if (this->mConnectedEntity->model != nullptr)
@@ -82,4 +81,5 @@ void core::HitBox::GenerateHitbox()
   {
     std::cout << "No connected entity" << std::endl;
   }
+  */
 }

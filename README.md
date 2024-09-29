@@ -1,6 +1,4 @@
 To build 
-You need libassimp and freetype
-then
 
 mkdir build
 cd build

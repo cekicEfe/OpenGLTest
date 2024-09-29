@@ -1,5 +1,8 @@
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+//
+//
+//
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,13 +23,17 @@
 
 int main(int argc, char **argv) {
   // initilizes glfw
-  glfwInit();
+  if (!glfwInit()) {
+    std::cerr << "GLFW initialization failed!" << std::endl;
+    return -1;
+  }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
   // For antialising
-  glfwWindowHint(GLFW_SAMPLES, 4);
+  // glfwWindowHint(GLFW_SAMPLES, 4);
 
   // creates window
   GLFWwindow *window = glfwCreateWindow(core::MainHandler::returnSCR_WIDTH(),
