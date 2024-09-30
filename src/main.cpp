@@ -25,6 +25,13 @@ int main(int argc, char **argv) {
   // initilizes glfw
   if (!glfwInit()) {
     std::cerr << "GLFW initialization failed!" << std::endl;
+    const char *description;
+    int code = glfwGetError(&description);
+
+    if (description)
+      std::cout << "Shit Code :" << code << "\n"
+                << "Shit Error Name :" << description << std::endl;
+
     return -1;
   }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,6 +50,13 @@ int main(int argc, char **argv) {
   // checks if windows is created succesfully
   if (window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
+    const char *description;
+    int code = glfwGetError(&description);
+
+    if (description)
+      std::cout << "Shit Code :" << code << "\n"
+                << "Shit Error Name :" << description << std::endl;
+
     glfwTerminate();
     return -1;
   }
