@@ -27,6 +27,7 @@
           pkgs.pkg-config            # To manage compilation flags
 	  pkgs.libxkbcommon
 	  pkgs.libGL
+	  pkgs.valgrind
 	];
 
         # Useful environment variables

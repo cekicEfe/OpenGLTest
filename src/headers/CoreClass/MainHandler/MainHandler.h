@@ -23,8 +23,8 @@ namespace core {
 
 class MainHandlerVariables {
 private:
-  const GLuint SCR_WIDTH = 640;
-  const GLuint SCR_HEIGHT = 480;
+  const GLuint SCR_WIDTH = 1920;
+  const GLuint SCR_HEIGHT = 1080;
   Camera mainCamera;
   GLfloat lastX = SCR_WIDTH / 2.0f;
   GLfloat lastY = SCR_HEIGHT / 2.0f;
@@ -59,6 +59,7 @@ public:
   MainHandler();
   ~MainHandler();
 
+  static void coreDemo();
   static void mouse_callback(GLFWwindow *window, double xpos, double ypos);
   static void scroll_callback(GLFWwindow *window, double xoffset,
                               double yoffset);

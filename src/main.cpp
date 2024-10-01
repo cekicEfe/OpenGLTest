@@ -1,7 +1,5 @@
 #include <glad/glad.h>
 //
-//
-//
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
@@ -16,6 +14,7 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
+#include <CoreClass/ErrorHandler/ErrorHandler.hpp>
 #include <CoreClass/MainHandler/MainHandler.h>
 
 #include <iostream>
@@ -25,17 +24,11 @@ int main(int argc, char **argv) {
   // initilizes glfw
   if (!glfwInit()) {
     std::cerr << "GLFW initialization failed!" << std::endl;
-    const char *description;
-    int code = glfwGetError(&description);
-
-    if (description)
-      std::cout << "Shit Code :" << code << "\n"
-                << "Shit Error Name :" << description << std::endl;
-
+    auto out = core::ErrorHandler::OutOpenglError();
     return -1;
   }
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
@@ -43,19 +36,15 @@ int main(int argc, char **argv) {
   // glfwWindowHint(GLFW_SAMPLES, 4);
 
   // creates window
-  GLFWwindow *window = glfwCreateWindow(core::MainHandler::returnSCR_WIDTH(),
-                                        core::MainHandler::returnSCR_HEIGHT(),
-                                        "Thingmabob", NULL, NULL);
+  GLFWwindow *window =
+      glfwCreateWindow(core::MainHandler::returnSCR_WIDTH(),
+                       core::MainHandler::returnSCR_HEIGHT(), "Thingmabob",
+                       glfwGetPrimaryMonitor(), NULL);
 
   // checks if windows is created succesfully
   if (window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
-    const char *description;
-    int code = glfwGetError(&description);
-
-    if (description)
-      std::cout << "Shit Code :" << code << "\n"
-                << "Shit Error Name :" << description << std::endl;
+    auto out = core::ErrorHandler::OutOpenglError();
 
     glfwTerminate();
     return -1;
@@ -112,6 +101,22 @@ int main(int argc, char **argv) {
     // Show gui
     core::MainHandler::showGui();
 
+    {
+      ImGui::Begin("delete window");
+      if (ImGui::Button("here")) {
+        glfwDestroyWindow(window);
+        // closes imgui
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
+        // closes glfw
+        glfwTerminate();
+        return 0;
+      }
+      ImGui::End();
+    }
+
     // opengl related settings
     glClearColor(0.00f, 0.00f, 0.00f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -119,6 +124,14 @@ int main(int argc, char **argv) {
 
     // Render Things Check what it renders
     core::MainHandler::DrawInstanced();
+
+    {
+      static int call_count = 1;
+      if (call_count == 1) {
+        core::MainHandler::coreDemo();
+        call_count = 0;
+      }
+    }
 
     // renders ImGui widgets
     ImGui::Render();

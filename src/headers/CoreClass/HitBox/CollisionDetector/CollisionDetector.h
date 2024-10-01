@@ -6,7 +6,6 @@
 namespace core {
 class CollisionDetector {
 public:
-  static void Detect(std::vector<std::unique_ptr<CoreEntity>> entities);
 };
 } // namespace core
 

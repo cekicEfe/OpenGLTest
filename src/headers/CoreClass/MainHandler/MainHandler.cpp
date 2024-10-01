@@ -1,5 +1,10 @@
 #include "MainHandler.h"
+#include "CoreClass/CoreEntity/CoreEntity.h"
+#include "model/Model.h"
+#include <algorithm>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 std::unordered_map<std::string,
@@ -25,21 +30,39 @@ void core::MainHandler::addCoreEntity() {}
 
 void core::MainHandler::addCoreEntity(Model::Model *entityModel) {}
 
+void core::MainHandler::coreDemo() {
+
+  core::MainHandler::msEntityBatch.insert(
+      std::make_pair<std::string,
+                     std::pair<std::unique_ptr<Model::Model>,
+                               std::vector<std::shared_ptr<core::CoreEntity>>>>(
+          "test", {std::make_unique<Model::Model>(
+                       "../models/backpack_model/backpack.obj"),
+                   std::vector<std::shared_ptr<core::CoreEntity>>()}));
+
+  Model::Light light;
+  light.light_pos = {0.0f, 10.0f, 0.0f};
+  light.light_color = {0.5, 0.5, 0.5};
+
+  core::MainHandler::msLights.push_back(std::make_unique<Model::Light>(light));
+  core::MainHandler::MainHandler::msShaders.push_back(std::make_unique<Shader>(
+      "../shaders/simpleVert.vert", "../shaders/simpleFrag.frag"));
+  msEntityBatch.find("test")->second.second.push_back(
+      std::make_shared<core::CoreEntity>());
+}
+
 // System related functions
-void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
-{
+void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime) {
   // wait time for pressing esc
   static GLfloat waitTime = 0.0f;
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && waitTime <= 0)
-  {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && waitTime <= 0) {
     MainHandlerVariables.simuFlag = !MainHandlerVariables.simuFlag;
     MainHandlerVariables.firstMouse = true;
     glfwSetCursorPos(window, MainHandlerVariables.SCR_WIDTH / 2,
                      MainHandlerVariables.SCR_HEIGHT / 2);
     waitTime = 0.35f;
   }
-  if (MainHandlerVariables.simuFlag)
-  {
+  if (MainHandlerVariables.simuFlag) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
       MainHandlerVariables.mainCamera.MovementSpeed = SPEED * 2;
@@ -67,9 +90,7 @@ void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
       MainHandlerVariables.mainCamera.ProcessKeyboard(
           UPWARD, MainHandlerVariables.deltaTime);
-  }
-  else
-  {
+  } else {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   }
   // decreases wait time
@@ -79,44 +100,36 @@ void core::MainHandler::processInput(GLFWwindow *window, GLfloat deltaTime)
     waitTime -= deltaTime;
 }
 
-void core::MainHandler::DrawInstanced()
-{
-  core::RenderHandler::DrawInstanced(core::MainHandlerVariables.SCR_WIDTH,
-                                     core::MainHandlerVariables.SCR_HEIGHT,
-                                     &core::MainHandlerVariables.mainCamera,
-                                     &core::MainHandler::msShaders,
-                                     &core::MainHandler::msLights,
-                                     &core::MainHandler::msEntityBatch);
+void core::MainHandler::DrawInstanced() {
+  core::RenderHandler::DrawInstanced(
+      core::MainHandlerVariables.SCR_WIDTH,
+      core::MainHandlerVariables.SCR_HEIGHT,
+      &core::MainHandlerVariables.mainCamera, &core::MainHandler::msShaders,
+      &core::MainHandler::msLights, &core::MainHandler::msEntityBatch);
 }
 
 void core::MainHandler::DrawInstancedWithInterval(GLfloat deltaTime,
                                                   GLfloat intervalMS) {}
 
 void core::MainHandler::framebuffer_size_callback(GLFWwindow *window, int width,
-                                                  int height)
-{
+                                                  int height) {
   glViewport(0, 0, width, height);
 }
 
 void core::MainHandler::mouse_callback(GLFWwindow *window, double xposIn,
-                                       double yposIn)
-{
+                                       double yposIn) {
   float ypos = static_cast<float>(yposIn);
   float xpos = static_cast<float>(xposIn);
 
   float xoffset = 0;
   float yoffset = 0;
 
-  if (MainHandlerVariables.simuFlag)
-  {
-    if (MainHandlerVariables.firstMouse)
-    {
+  if (MainHandlerVariables.simuFlag) {
+    if (MainHandlerVariables.firstMouse) {
       MainHandlerVariables.lastX = xpos;
       MainHandlerVariables.lastY = ypos;
       MainHandlerVariables.firstMouse = false;
-    }
-    else
-    {
+    } else {
       xoffset = xpos - MainHandlerVariables.lastX;
       yoffset = MainHandlerVariables.lastY -
                 ypos; // reversed since y-coordinates go from bottom to top
@@ -130,38 +143,32 @@ void core::MainHandler::mouse_callback(GLFWwindow *window, double xposIn,
 }
 
 void core::MainHandler::scroll_callback(GLFWwindow *window, double xoffset,
-                                        double yoffset)
-{
+                                        double yoffset) {
   if (MainHandlerVariables.simuFlag)
     MainHandlerVariables.mainCamera.ProcessMouseScroll(
         static_cast<float>(yoffset));
 }
 
-void core::MainHandler::calculateDeltaTime()
-{
+void core::MainHandler::calculateDeltaTime() {
   float currentFrame = static_cast<float>(glfwGetTime());
   MainHandlerVariables.deltaTime =
       currentFrame - MainHandlerVariables.lastFrame;
   MainHandlerVariables.counter++;
 
-  if (MainHandlerVariables.deltaTime >= 1.0f / 30.0f)
-  {
+  if (MainHandlerVariables.deltaTime >= 1.0f / 30.0f) {
     MainHandlerVariables.lastFrame = currentFrame;
     MainHandlerVariables.counter = 0;
   }
 }
 
-GLfloat core::MainHandler::returnDeltaTime()
-{
+GLfloat core::MainHandler::returnDeltaTime() {
   return MainHandlerVariables.deltaTime;
 }
 
-GLuint core::MainHandler::returnSCR_WIDTH()
-{
+GLuint core::MainHandler::returnSCR_WIDTH() {
   return core::MainHandlerVariables.SCR_WIDTH;
 }
 
-GLuint core::MainHandler::returnSCR_HEIGHT()
-{
+GLuint core::MainHandler::returnSCR_HEIGHT() {
   return core::MainHandlerVariables.SCR_HEIGHT;
 }
