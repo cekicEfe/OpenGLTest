@@ -1,8 +1,6 @@
 #include "MainHandler.h"
-#include "CoreClass/CoreEntity/CoreEntity.h"
-#include "model/Model.h"
-#include <algorithm>
 #include <memory>
+#include <model/Model.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -49,6 +47,20 @@ void core::MainHandler::coreDemo() {
       "../shaders/simpleVert.vert", "../shaders/simpleFrag.frag"));
   msEntityBatch.find("test")->second.second.push_back(
       std::make_shared<core::CoreEntity>());
+
+  auto test = core::OctTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), 45.0f);
+
+  std::cout << "Test OctTreeNode x:" << test.Box.position.x << std::endl;
+  std::cout << "Test OctTreeNode y:" << test.Box.position.y << std::endl;
+  std::cout << "Test OctTreeNode z:" << test.Box.position.z << std::endl;
+
+  test.subdivide();
+
+  for (auto &elem : test.Directions) {
+    std::cout << elem->Box.position.x << std::endl;
+    std::cout << elem->Box.position.y << std::endl;
+    std::cout << elem->Box.position.z << std::endl;
+  }
 }
 
 // System related functions

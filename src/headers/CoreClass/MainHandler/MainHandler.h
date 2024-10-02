@@ -8,6 +8,7 @@
 
 #include <CoreClass/CoreClassPreDec.h>
 #include <CoreClass/CoreEntity/CoreEntity.h>
+#include <CoreClass/HitBox/CollisionDetector/OctTree/OctTree.hpp>
 #include <CoreClass/JsonExtractor/JsonExtractor.h>
 #include <CoreClass/RenderHandler/RenderHandler.h>
 #include <CoreClass/SaveLoadHandler/SaveLoadHandler.h>

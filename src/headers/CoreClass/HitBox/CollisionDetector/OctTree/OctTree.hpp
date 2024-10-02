@@ -1,9 +1,9 @@
 #ifndef OCTTREE_HPP
 #define OCTTREE_HPP
 
-#include "ext/vector_float3.hpp"
 #include <CoreClass/CoreEntity/CoreEntity.h>
 #include <GL/gl.h>
+#include <array>
 #include <memory>
 
 namespace core {
@@ -11,44 +11,33 @@ namespace core {
 class OctBox {
 public:
   OctBox();
+  OctBox(glm::vec3 pos, GLfloat sqaureRadius);
   ~OctBox();
-  GLuint sqaureRadius; // HORRIBLE NAME since its a SQAURE
+  GLfloat sqaureRadius; // HORRIBLE NAME since its a SQAURE
+                        // Since we know what a SQUARE is knowing only one side
+                        // is enoughrfwe to know its shape and all
   glm::vec3 position;
+};
+
+enum OctDirection {
+  P_SOUTHWEST = 0,
+  P_NORTHEAST,
+  P_NORTHWEST,
+  P_SOUTHEAST,
+
+  N_SOUTHWEST,
+  N_NORTHEAST,
+  N_NORTHWEST,
+  N_SOUTHEAST,
 };
 
 class OctTreeNode {
 public:
   OctTreeNode();
+  OctTreeNode(glm::vec3 pos, GLfloat squareRadius);
   ~OctTreeNode();
-  //			N
-  //			//
-  //			//
-  //			//
-  //			//   --
-  //			//  7/
-  //			// //
-  //			////
-  //			///
-  // W////////////////////////////////////E
-  //		       ///
-  //		      ////
-  //		     //	//
-  //		    //	//
-  //		   //	//
-  //		  ++	//
-  //			//
-  //			//
-  //			S
 
-  std::unique_ptr<OctTreeNode> p_west;
-  std::unique_ptr<OctTreeNode> p_east;
-  std::unique_ptr<OctTreeNode> p_south;
-  std::unique_ptr<OctTreeNode> p_north;
-
-  std::unique_ptr<OctTreeNode> n_west;
-  std::unique_ptr<OctTreeNode> n_east;
-  std::unique_ptr<OctTreeNode> n_south;
-  std::unique_ptr<OctTreeNode> n_north;
+  std::array<std::unique_ptr<OctTreeNode>, 8> Directions;
 
   OctBox Box;
   std::shared_ptr<core::CoreEntity> heldEntity;
