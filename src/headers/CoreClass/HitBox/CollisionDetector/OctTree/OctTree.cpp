@@ -32,7 +32,7 @@ void core::OctTreeNode::subdivide() {
                  glm::vec3(i % 2 ? dummyRadius : -dummyRadius, dummyRadius,
                            i % 2 ? -dummyRadius : dummyRadius);
     }
-    if (i > 2) {
+    if (i >= 2) {
       dummyPos = this->Box.position +
                  glm::vec3(i % 2 ? dummyRadius : -dummyRadius, dummyRadius,
                            i % 2 ? dummyRadius : -dummyRadius);
@@ -47,7 +47,7 @@ void core::OctTreeNode::subdivide() {
                  glm::vec3(i % 2 ? dummyRadius : -dummyRadius, -dummyRadius,
                            i % 2 ? -dummyRadius : dummyRadius);
     }
-    if (i > 6) {
+    if (i >= 6) {
       dummyPos = this->Box.position +
                  glm::vec3(i % 2 ? dummyRadius : -dummyRadius, -dummyRadius,
                            i % 2 ? dummyRadius : -dummyRadius);
