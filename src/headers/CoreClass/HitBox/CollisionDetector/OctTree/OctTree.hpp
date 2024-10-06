@@ -19,16 +19,36 @@ public:
   glm::vec3 position;
 };
 
-enum OctDirection {
-  P_SOUTHWEST = 0,
-  P_NORTHEAST,
-  P_NORTHWEST,
-  P_SOUTHEAST,
+//                       PY       PZ
+//                       //       /
+//                       //      /
+//                       //     /
+//                       //    /
+//                       //   /
+//                       //  /
+//                       // /
+//                       ///
+//  NX////////////////////////////////////////PX
+//                      ///
+//                     / //
+//                    /  //
+//                   /   //
+//                  /    //
+//                 /     //
+//                /      //
+//               /       //
+//              PZ       NY
 
-  N_SOUTHWEST,
-  N_NORTHEAST,
-  N_NORTHWEST,
-  N_SOUTHEAST,
+enum OctDirection {
+  NXPYPZ = 0,
+  PXPYPZ,
+  NXNYPZ,
+  PXNYPZ,
+
+  NXPYNZ,
+  PXPYNZ,
+  NXNYNZ,
+  PXNYNZ
 };
 
 class OctTreeNode {
@@ -37,10 +57,13 @@ public:
   OctTreeNode(glm::vec3 pos, GLfloat squareRadius);
   ~OctTreeNode();
 
-  std::array<std::unique_ptr<OctTreeNode>, 8> Directions;
+  static std::vector<OctTreeNode *> octEndNodes;
+  std::array<std::unique_ptr<OctTreeNode>, 8> Directions; // AKA children
+
+  std::shared_ptr<core::CoreEntity> heldEntity;
+  std::shared_ptr<core::OctTreeNode> parentNode;
 
   OctBox Box;
-  std::shared_ptr<core::CoreEntity> heldEntity;
 
   void migrateHeldEntity();
   void subdivide();
