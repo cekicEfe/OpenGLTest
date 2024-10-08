@@ -40,32 +40,32 @@ public:
 //              PZ       NY
 
 enum OctDirection {
-  NXPYPZ = 0,
-  PXPYPZ,
+  NXNYNZ = 0,
   NXNYPZ,
-  PXNYPZ,
-
   NXPYNZ,
+  NXPYPZ,
+
+  PXNYNZ,
+  PXNYPZ,
   PXPYNZ,
-  NXNYNZ,
-  PXNYNZ
+  PXPYPZ
 };
 
 class OctTreeNode {
 public:
   OctTreeNode();
-  OctTreeNode(glm::vec3 pos, GLfloat squareRadius);
   ~OctTreeNode();
+  OctTreeNode(glm::vec3 pos, GLfloat squareRadius);
 
-  static std::vector<OctTreeNode *> octEndNodes;
   std::array<std::unique_ptr<OctTreeNode>, 8> Directions; // AKA children
 
-  std::shared_ptr<core::CoreEntity> heldEntity;
-  std::shared_ptr<core::OctTreeNode> parentNode;
+  std::vector<core::CoreEntity> *heldEntities;
+  core::OctTreeNode *parentNode;
 
   OctBox Box;
 
-  void migrateHeldEntity();
+  void insertEntity(core::CoreEntity *entity);
+  void debug(GLint option);
   void subdivide();
   //
 };

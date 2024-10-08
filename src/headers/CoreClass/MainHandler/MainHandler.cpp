@@ -1,4 +1,6 @@
 #include "MainHandler.h"
+#include "CoreClass/HitBox/CollisionDetector/OctTree/OctTree.hpp"
+#include "CoreClass/HitBox/HitBox.h"
 #include <memory>
 #include <model/Model.h>
 #include <string>
@@ -10,12 +12,18 @@ std::unordered_map<std::string,
                              std::vector<std::shared_ptr<core::CoreEntity>>>>
     core::MainHandler::msEntityBatch;
 
+std::vector<core::OctTreeNode *> core::MainHandler::msOctTreeEndNodes;
+std::unique_ptr<core::OctTreeNode> core::MainHandler::msParentOctTreeNode;
+
+std::unordered_map<std::string, std::unique_ptr<core::HitBox>>
+    core::MainHandler::msHitBoxBatch;
+
+std::vector<std::string> core::MainHandler::msShaderPaths;
 std::vector<std::string> core::MainHandler::msJsonScenePaths;
 std::vector<std::string> core::MainHandler::msJsonPreceptPaths;
-std::vector<std::string> core::MainHandler::msShaderPaths;
 
-std::vector<std::unique_ptr<Model::Light>> core::MainHandler::msLights;
 std::vector<std::unique_ptr<Shader>> core::MainHandler::msShaders;
+std::vector<std::unique_ptr<Model::Light>> core::MainHandler::msLights;
 
 std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonScenes;
 std::vector<std::unique_ptr<nlohmann::json>> core::MainHandler::msJsonPrecepts;
@@ -30,6 +38,9 @@ void core::MainHandler::addCoreEntity(Model::Model *entityModel) {}
 
 void core::MainHandler::coreDemo() {
 
+  // creates a batch with name "test" and has model of a backpack and a vector
+  // of entities
+  std::cout << "Creating demo main batch" << std::endl;
   core::MainHandler::msEntityBatch.insert(
       std::make_pair<std::string,
                      std::pair<std::unique_ptr<Model::Model>,
@@ -38,29 +49,49 @@ void core::MainHandler::coreDemo() {
                        "../models/backpack_model/backpack.obj"),
                    std::vector<std::shared_ptr<core::CoreEntity>>()}));
 
+  // creates demo light
+  std::cout << "Creating demo light" << std::endl;
   Model::Light light;
   light.light_pos = {0.0f, 10.0f, 0.0f};
   light.light_color = {0.5, 0.5, 0.5};
-
   core::MainHandler::msLights.push_back(std::make_unique<Model::Light>(light));
+
+  // creates demo shader
+  std::cout << "Creating demo shader" << std::endl;
   core::MainHandler::MainHandler::msShaders.push_back(std::make_unique<Shader>(
       "../shaders/simpleVert.vert", "../shaders/simpleFrag.frag"));
-  msEntityBatch.find("test")->second.second.push_back(
+
+  // creates hitbox with name "test_box"
+  std::cout << "Creating demo hitbox with name 'test_box' " << std::endl;
+  core::MainHandler::msHitBoxBatch.insert(
+      std::make_pair<std::string, std::unique_ptr<core::HitBox>>(
+          "test_box", std::make_unique<core::HitBox>()));
+
+  // configures hitbox
+  std::cout << "Configuring hitbox" << std::endl;
+  core::MainHandler::msHitBoxBatch.find("test_box")
+      ->second.get()
+      ->GenerateDemoCube();
+
+  // creates entity at main batch
+  std::cout << "Creating demo entity" << std::endl;
+  core::MainHandler::msEntityBatch.find("test")->second.second.push_back(
       std::make_shared<core::CoreEntity>());
 
-  auto test = core::OctTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), 45.0f);
+  // assigns "test_box" to demo entity
+  std::cout << "Assinging hitbox to demo entity demo" << std::endl;
+  core::MainHandler::msEntityBatch.find("test")
+      ->second.second.at(0)
+      .get()
+      ->hitbox =
+      core::MainHandler::msHitBoxBatch.find("test_box")->second.get();
 
-  std::cout << "Test OctTreeNode x:" << test.Box.position.x << std::endl;
-  std::cout << "Test OctTreeNode y:" << test.Box.position.y << std::endl;
-  std::cout << "Test OctTreeNode z:" << test.Box.position.z << std::endl;
-
-  test.subdivide();
-
-  for (auto &elem : test.Directions) {
-    std::cout << elem->Box.position.x << std::endl;
-    std::cout << elem->Box.position.y << std::endl;
-    std::cout << elem->Box.position.z << std::endl;
-  }
+  // creates OctTreeNode with pos and square border
+  std::cout << "Creating demo OctTree\n" << std::endl;
+  core::MainHandler::msParentOctTreeNode.reset(
+      new core::OctTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), 10000000.0f));
+  core::MainHandler::msParentOctTreeNode.get()->subdivide();
+  core::MainHandler::msParentOctTreeNode.get()->debug(1);
 }
 
 // System related functions

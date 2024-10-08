@@ -44,14 +44,20 @@ private:
                              std::vector<std::shared_ptr<core::CoreEntity>>>>
       msEntityBatch;
 
-  static std::vector<std::string> msShaderPaths;
-  static std::vector<std::string> msJsonPreceptPaths;
-  static std::vector<std::string> msJsonScenePaths;
+  static std::unordered_map<std::string, std::unique_ptr<core::HitBox>>
+      msHitBoxBatch;
 
+  static std::vector<std::string> msShaderPaths;
+  static std::vector<std::string> msJsonScenePaths;
+  static std::vector<std::string> msJsonPreceptPaths;
+
+  static std::vector<std::unique_ptr<Shader>> msShaders;
+  static std::vector<std::unique_ptr<Model::Light>> msLights;
   static std::vector<std::unique_ptr<nlohmann::json>> msJsonScenes;
   static std::vector<std::unique_ptr<nlohmann::json>> msJsonPrecepts;
-  static std::vector<std::unique_ptr<Model::Light>> msLights;
-  static std::vector<std::unique_ptr<Shader>> msShaders;
+
+  static std::vector<core::OctTreeNode *> msOctTreeEndNodes;
+  static std::unique_ptr<core::OctTreeNode> msParentOctTreeNode;
 
   static void addCoreEntity();
   static void addCoreEntity(Model::Model *entityModel);

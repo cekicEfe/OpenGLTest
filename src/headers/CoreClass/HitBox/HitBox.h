@@ -1,25 +1,22 @@
 #ifndef TESTHITBOX_H
 #define TESTHITBOX_H
 
+#include "ext/vector_float3.hpp"
 #include <CoreClass/CoreClassPreDec.h>
-#include <CoreClass/CoreEntity/CoreEntity.h>
+#include <glm.hpp>
+#include <model/Model.h>
+#include <vector>
 
 namespace core {
 class HitBox {
 public:
-  enum Type { STATIC, ACTIVE };
+  HitBox();
+  ~HitBox();
 
-  CoreEntity *mConnectedEntity = nullptr;
+  void GenerateDemoCube();
+  void GenerateHitbox(Model::Model *pMdl);
 
-  glm::vec3 mTopPos;
-  glm::vec3 mBotPos;
-  glm::vec3 mFrontPos;
-  glm::vec3 mRearPos;
-  glm::vec3 mLeftPos;
-  glm::vec3 mRightPos;
-
-  void AttachEntity(CoreEntity *entity);
-  void GenerateHitbox();
+  std::vector<glm::vec3> points;
 };
 } // namespace core
 
