@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <utility>
 
-std::pair<int, std::string> core::ErrorHandler::OutOpenglError() {
+std::pair<int, std::string> core::ErrorHandler::ReturnOpenglError() {
   const char *description;
   int code = glfwGetError(&description);
 

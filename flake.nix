@@ -28,13 +28,13 @@
 	  pkgs.libxkbcommon
 	  pkgs.libGL
 	  pkgs.valgrind
+	  pkgs.xorg.libX11
 	];
-
-        # Useful environment variables
       shellHook = ''
-	export LD_LIBRARY_PATH=${pkgs.glfw}/lib:${pkgs.assimp}/lib:${pkgs.freetype}/lib:${pkgs.libpng}/lib:${pkgs.wayland}/lib:${pkgs.libxkbcommon}/lib:${pkgs.libGL}/lib:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=${pkgs.glfw-wayland}/lib:${pkgs.xorg.libX11}/lib:${pkgs.glm}/lib:${pkgs.assimp}/lib:${pkgs.freetype}/lib:${pkgs.libpng}/lib:${pkgs.wayland}/lib:${pkgs.libxkbcommon}/lib:${pkgs.libGL}/lib:$LD_LIBRARY_PATH
 	echo "OpenGL development environment is ready!"
-        '';
+        PS1="[\\u@\\h && OPENGL-DEV-ENV:\\w]\$ "
+	'';
       };
     });
 }

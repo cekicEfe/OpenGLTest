@@ -19,20 +19,23 @@ file(GLOB_RECURSE SOURCES
                
 add_executable(MAIN_EXEC ${SOURCES})
 
-target_compile_options(MAIN_EXEC PUBLIC -std=c++17 -Wall -g -I../src/headers
-  -I../include/GLFW)
+target_compile_options(MAIN_EXEC PUBLIC -std=c++17 -Wall -g 
+  -I../src/headers
+  -I../include/GLFW
+)
 
 target_link_libraries(MAIN_EXEC
-    ${CMAKE_CURRENT_LIST_DIR}/libs/libglm.a
-    ${CMAKE_CURRENT_LIST_DIR}/libs/libglfw3.a
+  #    ${CMAKE_CURRENT_LIST_DIR}/libs/libglm.a
+  #  ${CMAKE_CURRENT_LIST_DIR}/libs/libglfw3.a
+    glm
+    glfw 
     assimp
     freetype
-    )
+)
 
 target_include_directories(MAIN_EXEC PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src
                                          ${CMAKE_CURRENT_LIST_DIR}/src/header
                                          ${CMAKE_CURRENT_LIST_DIR}/include
-                                         ${CMAKE_CURRENT_LIST_DIR}/include/glm
                                          ${CMAKE_CURRENT_LIST_DIR}/include/glad
                                          ${CMAKE_CURRENT_LIST_DIR}/include/imgui
                                          ${CMAKE_CURRENT_LIST_DIR}/include/stb_image

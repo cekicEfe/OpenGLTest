@@ -11,23 +11,25 @@
 #include <map>
 #include <memory>
 
-namespace core
-{
-  class RenderHandler
-  {
-  public:
-    RenderHandler();
-    ~RenderHandler();
+namespace core {
+class RenderHandler {
+private:
+  RenderHandler();
+  ~RenderHandler();
+  static core::RenderHandler *instance;
 
-    void static DrawInstanced(
-        float width, float height, Camera *camera = NULL,
-        std::vector<std::unique_ptr<Shader>> *shader = NULL,
-        std::vector<std::unique_ptr<Model::Light>> *lights = NULL,
-        std::unordered_map<std::string,
-                           std::pair<std::unique_ptr<Model::Model>,
-                                     std::vector<std::shared_ptr<core::CoreEntity>>>>
-            *map = NULL);
-  };
+  void
+  DrawInstanced(const float scr_width, const float scr_height,
+                Camera *const camera = NULL,
+                const std::vector<Model::Light> *const lights = NULL,
+                const std::vector<core::CoreEntity> *const entities = NULL);
+
+public:
+  static core::RenderHandler *createInstance();
+  void deleteInstance();
+
+  void DrawBatches();
+};
 } // namespace core
 
 #endif // !RENDERFUNCTOR_H
