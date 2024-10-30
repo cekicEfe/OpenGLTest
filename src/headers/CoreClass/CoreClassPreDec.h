@@ -1,8 +1,6 @@
 #ifndef CORECLASS_H
 #define CORECLASS_H
 
-// Further decleration? for dependent classes
-
 int main(int, char **);
 
 namespace core {

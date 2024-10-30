@@ -3,7 +3,6 @@
 
 #include <CoreClass/CoreEntity/CoreEntity.h>
 #include <CoreClass/JsonExtractor/JsonExtractor.h>
-#include <CoreClass/MainHandler/MyPaths.h>
 
 #include <filesystem>
 #include <iostream>

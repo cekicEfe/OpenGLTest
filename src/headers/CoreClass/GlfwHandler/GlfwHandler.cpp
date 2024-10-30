@@ -40,7 +40,6 @@ void core::GlfwHandler::initGlfw() {
   if (this->window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
     auto out = core::ErrorHandler::ReturnOpenglError();
-
     throw -1;
   }
 
@@ -74,6 +73,9 @@ void core::GlfwHandler::setLoopVariables() {
 void core::GlfwHandler::swapBuffers() {
   // for opengl bufferswap
   glfwSwapBuffers(this->window);
+}
+void core::GlfwHandler::pollEvents() {
+  // for opengl poll events
   glfwPollEvents();
 }
 void core::GlfwHandler::terminateGlfw() {

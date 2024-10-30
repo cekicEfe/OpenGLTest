@@ -45,6 +45,7 @@ public:
   // Use to set up glfw
   void setLoopVariables();
   void swapBuffers();
+  void pollEvents();
   void initGlfw();
   void terminateGlfw();
 

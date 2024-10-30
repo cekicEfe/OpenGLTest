@@ -15,9 +15,9 @@ public:
   void GenerateDemoCube();
   void GenerateHitbox(Model::Model *pMdl);
 
-  GLfloat XMaxLenRadius;
-  GLfloat YMaxLenRadius;
-  GLfloat ZMaxLenRadius;
+  GLfloat XMaxLen;
+  GLfloat YMaxLen;
+  GLfloat ZMaxLen;
 
   std::vector<glm::vec3> points;
 };

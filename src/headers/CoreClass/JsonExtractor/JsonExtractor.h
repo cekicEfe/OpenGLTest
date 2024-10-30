@@ -10,7 +10,9 @@
 namespace core {
 class JsonExtractor {
 public:
-  static nlohmann::json *loadJsonFromPath(std::string path);
+  JsonExtractor();
+  ~JsonExtractor();
+  nlohmann::json *loadJsonFromPath(std::string path);
 };
 } // namespace core
 

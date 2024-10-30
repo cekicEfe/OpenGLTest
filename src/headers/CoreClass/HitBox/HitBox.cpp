@@ -1,6 +1,6 @@
 #include "HitBox.h"
 
-// Generates a Hitbox by sort throughghhg nodes which kind of sucks
+// Generates a Hitbox by sorting through nodes
 core::HitBox::HitBox() {}
 core::HitBox::~HitBox() {}
 
@@ -12,9 +12,9 @@ void core::HitBox::GenerateDemoCube() {
         this->points.push_back(glm::vec3(0.5f * (i % 2 ? -1 : +1),
                                          0.5f * (j % 2 ? -1 : +1),
                                          0.5f * (k % 2 ? -1 : +1)));
-        this->XMaxLenRadius = 0.5f;
-        this->YMaxLenRadius = 0.5f;
-        this->ZMaxLenRadius = 0.5f;
+        this->XMaxLen = 0.5f;
+        this->YMaxLen = 0.5f;
+        this->ZMaxLen = 0.5f;
       }
     }
   }

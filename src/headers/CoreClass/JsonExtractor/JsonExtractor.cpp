@@ -1,5 +1,8 @@
 #include "JsonExtractor.h"
 
+core::JsonExtractor::JsonExtractor() {}
+core::JsonExtractor::~JsonExtractor() {}
+
 nlohmann::json *core::JsonExtractor::loadJsonFromPath(std::string path) {
   std::ifstream file(path.c_str());
 

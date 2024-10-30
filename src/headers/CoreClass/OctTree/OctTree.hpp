@@ -6,16 +6,12 @@
 #include <array>
 #include <memory>
 
-namespace core {
+namespace core
+{
 
-class OctBox {
-public:
-  OctBox();
-  OctBox(glm::vec3 pos, GLfloat sqaureRadius);
-  ~OctBox();
-  GLfloat sqaureRadius;
-  glm::vec3 position;
-};
+class OctTreeNode;
+class OctTreeNodeEntity;
+class OctTreeNodeEntityReference;
 
 //                       PY       PZ
 //    /////////////////////       /
@@ -37,7 +33,8 @@ public:
 //               /       //
 //              PZ       NY
 
-enum OctDirection {
+enum OctDirection
+{
   NXNYNZ = 0,
   NXNYPZ,
   NXPYNZ,
@@ -49,25 +46,79 @@ enum OctDirection {
   PXPYPZ
 };
 
-class OctTreeNode {
+class OctBox
+{
 public:
-  OctTreeNode();
-  ~OctTreeNode();
-  OctTreeNode(glm::vec3 pos, GLfloat squareRadius);
+  OctBox ();
+  OctBox (glm::vec3 pos, GLfloat sqaureRadius);
+  ~OctBox ();
 
-  core::OctTreeNode *parentNode = NULL;
-  std::vector<core::CoreEntity *> heldEntities;
-  std::array<std::unique_ptr<OctTreeNode>, 8> Directions;
+  GLfloat sqaureRadius;
+
+  glm::vec3 position;
+};
+
+class OctTreeNodeEntity
+{
+private:
+  std::unique_ptr<core::CoreEntity> mHeldEntity;
+  core::OctTreeNode *mCurrentOctTreeNode = nullptr;
+  std::vector<std::shared_ptr<OctTreeNodeEntityReference> > mReferences;
+
+public:
+  OctTreeNodeEntity (core::OctTreeNode *currentNode, core::CoreEntity *entity);
+  ~OctTreeNodeEntity ();
+
+  const core::CoreEntity *const returnEntity ();
+  void setHeldEntity (core::CoreEntity *entity);
+  void setCurrentOctTreeNode (core::OctTreeNode *node);
+  const std::shared_ptr<OctTreeNodeEntityReference> createReference ();
+  void removeReference (core::OctTreeNodeEntityReference &entityReference);
+};
+
+class OctTreeNodeEntityReference
+{
+private:
+  core::OctTreeNodeEntity *mEntityReference = nullptr;
+
+public:
+  OctTreeNodeEntityReference (core::OctTreeNodeEntity *reference);
+  ~OctTreeNodeEntityReference ();
+
+  const core::OctTreeNodeEntity *const ReturnReference ();
+
+  friend class core::OctTreeNodeEntity;
+};
+
+class OctTreeNode
+{
+private:
+  void subdivide ();
+
+  void debug (GLint option);
 
   OctBox Box;
 
-  // Must be used at node 0
-  void insertEntity(core::CoreEntity *entity);
+  std::string generation;
 
-  void resolveEntityCramp();
-  void debug(GLint option);
-  void subdivide();
+  core::CoreEntity *heldEntity = nullptr;
+
+  core::OctTreeNode *parentNode = nullptr;
+
+  std::array<std::unique_ptr<OctTreeNode>, 8> Directions;
+
+public:
+  OctTreeNode ();
+  ~OctTreeNode ();
+  OctTreeNode (glm::vec3 pos, GLfloat squareRadius, std::string genLeaf);
+
+  void printChildsRecursivly ();
+
+  std::vector<core::CoreEntity *const> returnEndNodes ();
+
+  void insertEntityToEmptyLeaf (core::CoreEntity *const entity);
 };
+
 } // namespace core
 
 #endif
