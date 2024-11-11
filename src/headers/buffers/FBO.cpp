@@ -1,22 +1,25 @@
 #include "FBO.h"
 
-FBO::FBO()
+FBO::FBO ()
 {
-	glGenFramebuffers(1, &this->id);
+  glGenFramebuffers (1, &this->id);
 }
-FBO::~FBO()
+FBO::~FBO ()
 {
-	this->Delete();
+  this->Delete ();
 }
-void FBO::Bind()
+void
+FBO::Bind ()
 {
-	glBindFramebuffer( GL_FRAMEBUFFER, this->id );
+  glBindFramebuffer (GL_FRAMEBUFFER, this->id);
 }
-void FBO::Unbind()
+void
+FBO::Unbind ()
 {
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+  glBindFramebuffer (GL_FRAMEBUFFER, 0);
 }
-void FBO::Delete()
+void
+FBO::Delete ()
 {
-	glDeleteFramebuffers(1, &this->id);
+  glDeleteFramebuffers (1, &this->id);
 }

@@ -5,31 +5,31 @@
 
 enum VERTEX_OFFSET
 {
-	POSITION ,
-	NORMAL ,
-	TEXTURE ,
-	TANGENT,
-	B_TANGENT,
-	BONE,
-	WEIGHT,
-	COLOR,
-	INSTANCE_MATRIX
+  POSITION,
+  NORMAL,
+  TEXTURE,
+  TANGENT,
+  B_TANGENT,
+  BONE,
+  WEIGHT,
+  COLOR,
+  INSTANCE_MATRIX
 };
 
-namespace Model 
+namespace Model
 {
 
-  struct Vertex
-  {
-    glm::vec3 position;
-    glm::vec4 color;
-    glm::vec3 normal;
-    glm::vec2 texture;
-    glm::vec3 tangent;
-    glm::vec3 biTangent;
-    int boneIds[4];//4 is the max bone influence
-    float weights[4];
-  };
+struct Vertex
+{
+  glm::vec3 position;
+  glm::vec4 color;
+  glm::vec3 normal;
+  glm::vec2 texture;
+  glm::vec3 tangent;
+  glm::vec3 biTangent;
+  int boneIds[4]; // 4 is the max bone influence
+  float weights[4];
+};
 
 }
 

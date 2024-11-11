@@ -55,28 +55,32 @@ main (int argc, char **argv)
   core::OctTreeNode test (glm::vec3 (0.0f, 0.0f, 0.0f), 20, "Origin//");
 
   core::CoreEntity entity1;
-  entity1.movComponent.pos = { 5.0f, 13.0f, 1.0f };
+  core::MovementComponent mvcomp;
+  mvcomp.pos = { 1.0, 3.0f, 15.0f };
+  entity1.setMovementComp (mvcomp);
 
   core::CoreEntity entity2;
-  entity2.movComponent.pos = { 3.0f, 5.0f, 1.0f };
+  mvcomp.pos = { 3.0f, 5.0f, 1.0f };
+  entity2.setMovementComp (mvcomp);
 
   core::CoreEntity entity3;
-  entity3.movComponent.pos = { 5.0f, -5.0f, -5.0f };
+  mvcomp.pos = { 5.0f, -5.0f, -5.0f };
+  entity3.setMovementComp (mvcomp);
 
   core::CoreEntity entity4;
-  entity4.movComponent.pos = { 11.0f, 12.0f, -13.0f };
+  mvcomp.pos = { 11.0f, 12.0f, -13.0f };
+  entity4.setMovementComp (mvcomp);
 
-  test.insertEntityToEmptyLeaf (&entity1);
-  test.insertEntityToEmptyLeaf (&entity2);
-  test.insertEntityToEmptyLeaf (&entity3);
-  test.insertEntityToEmptyLeaf (&entity4);
+  test.insertEntity (&entity1);
+  test.insertEntity (&entity2);
+  test.insertEntity (&entity3);
+  test.insertEntity (&entity4);
   test.printChildsRecursivly ();
   // End of Demo
 
   // Main loop
   while (!glfwHandler->checkWindowShouldClose ())
     {
-
       static GLfloat localDeltaTime = 0;
       glfwHandler->calculateDeltaTime ();
       localDeltaTime = glfwHandler->returnDeltaTime ();

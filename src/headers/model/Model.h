@@ -23,9 +23,11 @@
 #include <string>
 #include <vector>
 
-namespace Model {
+namespace Model
+{
 
-class Texture {
+class Texture
+{
 public:
   GLuint ID;
   std::string type;
@@ -33,28 +35,30 @@ public:
 };
 
 // COMPLETE
-class Mesh {
+class Mesh
+{
 public:
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
 
-  Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
-       std::vector<Texture> textures);
-  void Draw(Shader &shader);
+  Mesh (std::vector<Vertex> vertices, std::vector<GLuint> indices,
+        std::vector<Texture> textures);
+  void Draw (Shader &shader);
 
   VBO vbo;
   EBO ebo;
   VAO vao;
-  void setupMesh();
+  void setupMesh ();
 };
 
-class Model {
+class Model
+{
 public:
-  Model(std::string const &path, GLboolean gamma = false);
-  GLboolean HasTexture();
-  void Draw(Shader &shader);
-  ~Model();
+  Model (std::string const &path, GLboolean gamma = false);
+  GLboolean HasTexture () const;
+  void Draw (Shader &shader);
+  ~Model ();
 
   // private:
   std::vector<Mesh> Meshes;
@@ -63,18 +67,20 @@ public:
   std::string path;
   GLboolean gammaCorrection;
 
-  void loadModel(std::string path);
-  void processNode(aiNode *node, const aiScene *scene);
-  Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-  std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
-                                            std::string typeName);
-  GLuint TextureFromFile(const char *path, const std::string &directory,
-                         bool gamma);
+  void loadModel (std::string path);
+  void processNode (aiNode *node, const aiScene *scene);
+  Mesh processMesh (aiMesh *mesh, const aiScene *scene);
+  std::vector<Texture> loadMaterialTextures (aiMaterial *mat,
+                                             aiTextureType type,
+                                             std::string typeName);
+  GLuint TextureFromFile (const char *path, const std::string &directory,
+                          bool gamma);
 };
 
-class Light {
+class Light
+{
 public:
-  virtual nlohmann::json saveAsJson();
+  virtual nlohmann::json saveAsJson ();
   glm::vec3 light_color;
   glm::vec3 light_pos;
   GLfloat ambient = 0;
@@ -82,7 +88,8 @@ public:
   GLfloat specular = 0;
 };
 
-class Material {
+class Material
+{
 public:
   GLfloat ambient;
   GLfloat diffuse;

@@ -1,21 +1,22 @@
 #ifndef FBO_H
 #define FBO_H
 
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
+#include <glad/glad.h>
+//
+#include <GLFW/glfw3.h>
 
-//Frame buffer object
+// Frame buffer object
 class FBO
 {
-	public:
-		GLuint id;
+public:
+  GLuint id;
 
-		FBO();
-		~FBO();
+  FBO ();
+  ~FBO ();
 
-		void Bind();
-		void Unbind();
-		void Delete();
+  void Bind ();
+  void Unbind ();
+  void Delete ();
 };
 
 #endif // !FBO_H

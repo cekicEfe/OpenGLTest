@@ -69,9 +69,10 @@ public:
   OctTreeNodeEntity (core::OctTreeNode *currentNode, core::CoreEntity *entity);
   ~OctTreeNodeEntity ();
 
-  const core::CoreEntity *const returnEntity ();
   void setHeldEntity (core::CoreEntity *entity);
   void setCurrentOctTreeNode (core::OctTreeNode *node);
+
+  const core::CoreEntity *const returnEntity ();
   const std::shared_ptr<OctTreeNodeEntityReference> createReference ();
   void removeReference (core::OctTreeNodeEntityReference &entityReference);
 };
@@ -94,17 +95,12 @@ class OctTreeNode
 {
 private:
   void subdivide ();
-
   void debug (GLint option);
 
   OctBox Box;
-
   std::string generation;
-
-  core::CoreEntity *heldEntity = nullptr;
-
+  std::unique_ptr<core::OctTreeNodeEntity> heldEntity;
   core::OctTreeNode *parentNode = nullptr;
-
   std::array<std::unique_ptr<OctTreeNode>, 8> Directions;
 
 public:
@@ -113,10 +109,8 @@ public:
   OctTreeNode (glm::vec3 pos, GLfloat squareRadius, std::string genLeaf);
 
   void printChildsRecursivly ();
-
   std::vector<core::CoreEntity *const> returnEndNodes ();
-
-  void insertEntityToEmptyLeaf (core::CoreEntity *const entity);
+  void insertEntity (core::CoreEntity *const entity);
 };
 
 } // namespace core

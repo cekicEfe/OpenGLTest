@@ -1,18 +1,21 @@
 #include "VAO.h"
 
-VAO::VAO()
+VAO::VAO ()
 {
-	glGenVertexArrays(1, &this->id);
+  glGenVertexArrays (1, &this->id);
 }
-void VAO::Bind()
+void
+VAO::Bind ()
 {
-	glBindVertexArray(this->id);
+  glBindVertexArray (this->id);
 }
-void VAO::Unbind()
+void
+VAO::Unbind ()
 {
-	glBindVertexArray(0);
+  glBindVertexArray (0);
 }
-void VAO::Delete()
+void
+VAO::Delete ()
 {
-	glDeleteVertexArrays(1, &this->id);
+  glDeleteVertexArrays (1, &this->id);
 }
