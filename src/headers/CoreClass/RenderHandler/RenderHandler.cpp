@@ -1,4 +1,6 @@
 #include "CoreClass/RenderHandler/RenderHandler.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/quaternion_transform.hpp"
 #include <glm/glm.hpp>
 
 core::RenderHandler *core::RenderHandler::instance = nullptr;
@@ -47,19 +49,21 @@ core::RenderHandler::deleteInstance () const
 
 void
 core::RenderHandler::DrawInstanced (
-    float SCR_WIDTH, float SCR_HEIGHT, Camera *const camera,
+    const GLuint &SCR_WIDTH, const GLuint &SCR_HEIGHT, const Camera &camera,
     const std::vector<Model::Light> *const lights,
-    const std::vector<core::CoreEntity> *const entities) const
+    const std::vector<std::unique_ptr<core::CoreEntity> > *const entities)
+    const
 {
-  if (camera != NULL && lights != NULL && entities != NULL
-      && (lights->size () > 0) && (entities->size () > 0))
+  if (lights != NULL && entities != NULL && (lights->size () > 0)
+      && (entities->size () > 0))
     {
 
       for (size_t i = 0; i < entities->size (); i++)
         {
 
-          static const Model::Model *model = entities->at (i).getModel ();
-          static const Shader *shader = entities->at (i).getShader ();
+          static const Model::Model *model
+              = entities->at (i).get ()->getModel ();
+          static const Shader *shader = entities->at (i).get ()->getShader ();
           static bool initBatch = true;
           static std::vector<glm::mat4> modelMatrices;
 
@@ -69,7 +73,7 @@ core::RenderHandler::DrawInstanced (
                   glm::radians (45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT,
                   CLOSE_SIGHT, FAR_SIGHT);
 
-              glm::mat4 view = camera->GetViewMatrix ();
+              glm::mat4 view = camera.GetViewMatrix ();
 
               shader->setInt ("texture_diffuse1", 0);
               shader->setFloat ("time", glfwGetTime ());
@@ -86,27 +90,26 @@ core::RenderHandler::DrawInstanced (
                                    lights->at (i).light_color);
                 }
 
-              model = entities->at (i).getModel ();
-              shader = entities->at (i).getShader ();
+              model = entities->at (i).get ()->getModel ();
+              shader = entities->at (i).get ()->getShader ();
               modelMatrices.clear ();
 
               initBatch = false;
             }
 
-          if (model != entities->at (i + 1).getModel ()
-              || shader != entities->at (i + 1).getShader ()
+          if (model != entities->at (i + 1).get ()->getModel ()
+              || shader != entities->at (i + 1).get ()->getShader ()
               || i + 1 == entities->size ())
             {
 
               glm::mat4 modelMatrix = glm::mat4 (1.0);
               modelMatrix = glm::translate (
-                  modelMatrix, entities->at (i).getMovementComp ()->pos);
-              modelMatrix = glm::scale (modelMatrix,
-                                        *entities->at (i).getModelScale ());
-              modelMatrix = glm::rotate (
-                  modelMatrix,
-                  entities->at (i).getRotationComp ()->RotationDegreeDueAxis,
-                  entities->at (i).getRotationComp ()->RotationAxis);
+                  modelMatrix, *entities->at (i).get ()->getPos ());
+              modelMatrix = glm::scale (
+                  modelMatrix, *entities->at (i).get ()->getModelScale ());
+              auto &rot = *entities->at (i).get ()->getRot ();
+              modelMatrix
+                  = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y, rot.z });
               modelMatrices.push_back (modelMatrix);
 
               GLuint buffer;
@@ -117,9 +120,11 @@ core::RenderHandler::DrawInstanced (
                             &modelMatrices[0], GL_STATIC_DRAW);
 
               for (GLuint j = 0;
-                   j < entities->at (i).getModel ()->Meshes.size (); j++)
+                   j < entities->at (i).get ()->getModel ()->Meshes.size ();
+                   j++)
                 {
-                  GLuint VAO = entities->at (i).getModel ()->Meshes[j].vao.id;
+                  GLuint VAO
+                      = entities->at (i).get ()->getModel ()->Meshes[j].vao.id;
                   glBindVertexArray (VAO);
 
                   glEnableVertexAttribArray (4);
@@ -149,26 +154,34 @@ core::RenderHandler::DrawInstanced (
               // Draws objects here
               shader->use ();
               for (GLuint g = 0;
-                   g < entities->at (i).getModel ()->Meshes.size (); g++)
+                   g < entities->at (i).get ()->getModel ()->Meshes.size ();
+                   g++)
                 {
-                  if (entities->at (i).getModel ()->HasTexture ())
+                  if (entities->at (i).get ()->getModel ()->HasTexture ())
                     {
                       glActiveTexture (GL_TEXTURE0);
-                      glBindTexture (
-                          GL_TEXTURE_2D,
-                          entities->at (i).getModel ()->Textures.at (0).ID);
+                      glBindTexture (GL_TEXTURE_2D, entities->at (i)
+                                                        .get ()
+                                                        ->getModel ()
+                                                        ->Textures.at (0)
+                                                        .ID);
                     }
-                  glBindVertexArray (
-                      entities->at (i).getModel ()->Meshes.at (g).vao.id);
+                  glBindVertexArray (entities->at (i)
+                                         .get ()
+                                         ->getModel ()
+                                         ->Meshes.at (g)
+                                         .vao.id);
                   glDrawElementsInstanced (
                       GL_TRIANGLES,
                       static_cast<GLuint> (entities->at (i)
-                                               .getModel ()
+                                               .get ()
+                                               ->getModel ()
                                                ->Meshes.at (g)
                                                .indices.size ()),
                       GL_UNSIGNED_INT, 0, modelMatrices.size ());
                   glBindVertexArray (0);
                 }
+              shader->stop ();
 
               glDeleteBuffers (1, &buffer);
               initBatch = true;
@@ -177,13 +190,12 @@ core::RenderHandler::DrawInstanced (
             {
               glm::mat4 modelMatrix = glm::mat4 (1.0);
               modelMatrix = glm::translate (
-                  modelMatrix, entities->at (i).getMovementComp ()->pos);
-              modelMatrix = glm::scale (modelMatrix,
-                                        *entities->at (i).getModelScale ());
-              modelMatrix = glm::rotate (
-                  modelMatrix,
-                  entities->at (i).getRotationComp ()->RotationDegreeDueAxis,
-                  entities->at (i).getRotationComp ()->RotationAxis);
+                  modelMatrix, *entities->at (i).get ()->getPos ());
+              modelMatrix = glm::scale (
+                  modelMatrix, *entities->at (i).get ()->getModelScale ());
+              auto &rot = *entities->at (i).get ()->getRot ();
+              modelMatrix
+                  = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y, rot.z });
               modelMatrices.push_back (modelMatrix);
             }
         }

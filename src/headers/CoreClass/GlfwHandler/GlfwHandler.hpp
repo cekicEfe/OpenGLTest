@@ -1,62 +1,63 @@
 #ifndef GLFWHANDLER_HPP
 #define GLFWHANDLER_HPP
 
-#include <model/Camera.h>
+#include <CoreClass/GlfwHandler/WindowHandler/Window/Window.h>
+#include <CoreClass/GlfwHandler/WindowHandler/WindowHandler.hpp>
 //
 #include <CoreClass/ErrorHandler/ErrorHandler.hpp>
-#include <GLFW/glfw3.h>
+#include <CoreClass/GlfwHandler/ImGuiHandler/ImGuiHandler.hpp>
 #include <iostream>
 
-namespace core {
+namespace core
+{
 
-class GlfwHandler {
+class GlfwHandler
+{
 private:
-  static GLuint SCR_WIDTH;
-  static GLuint SCR_HEIGHT;
-  static GLfloat lastX;
-  static GLfloat lastY;
-  static GLboolean firstMouse;
-  static GLuint counter;
-  static GLboolean simuFlag;
-  static GLfloat deltaTime;
-  static GLfloat lastFrame;
-
-  static Camera mainCamera;
-
   static core::GlfwHandler *instance;
-  static GLFWwindow *window;
 
-  GlfwHandler();
-  ~GlfwHandler();
+  GlfwHandler ();
+  ~GlfwHandler ();
 
-  // Input related functions to make glfw point at YOUR functions
-  static void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-  static void scroll_callback(GLFWwindow *window, double xoffset,
-                              double yoffset);
-  static void framebuffer_size_callback(GLFWwindow *window, int width,
-                                        int height);
+  GlfwHandler (GlfwHandler &other) = delete;
+  void operator= (const GlfwHandler &) = delete;
+
+  core::WindowHandler windowHandler;
+  core::ImGuiHandler imguiHandler;
+
+  void (*func) (GLFWwindow *window, GLfloat deltaTime) = nullptr;
+
+  void setLoopVariables ();
+  void swapBuffers ();
+  void pollEvents ();
+  void processInput (GLfloat deltaTime);
 
 public:
-  // Use to create instance
-  static core::GlfwHandler *createInstance();
-  // Use to delete instance
-  void deleteInstance();
+  static core::GlfwHandler *createInstance ();
+  void deleteInstance ();
 
-  // Use to set up glfw
-  void setLoopVariables();
-  void swapBuffers();
-  void pollEvents();
-  void initGlfw();
-  void terminateGlfw();
+  void startOfLoop (GLfloat deltaTime);
+  void endOfLoop ();
 
-  // For main loop checks if main window is closed
-  GLboolean checkWindowShouldClose();
-  GLFWwindow *returnWindow();
+  const core::Window returnMainWindow ();
+  GLuint checkWindowShouldClose ();
 
-  // Input related use it at main loop
-  void calculateDeltaTime();
-  GLfloat returnDeltaTime();
-  void processInput(GLFWwindow *window, GLfloat deltaTime);
+  void initGlfw (std::string windowName, WindowType type, GLuint SCR_WIDTH,
+                 GLuint SCR_HEIGHT);
+  void terminateGlfw ();
+
+  void setMainWindowMouseCallback (void (*func) (GLFWwindow *window,
+                                                 double xposIn,
+                                                 double yposIn));
+  void setMainWindowFramebufferSizeCallback (void (*func) (GLFWwindow *window,
+                                                           int width,
+                                                           int height));
+  void setMainWindowScrollCallback (void (*func) (GLFWwindow *window,
+                                                  double xoffset,
+                                                  double yoffset));
+  void setMainWindowInputMode (int type, int mode);
+  void setMainWindowInputProcessor (void (*func) (GLFWwindow *window,
+                                                  GLfloat deltaTime));
 };
 
 } // namespace core

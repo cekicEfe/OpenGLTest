@@ -25,8 +25,6 @@ target_compile_options(MAIN_EXEC PUBLIC -std=c++17 -Wall -g
 )
 
 target_link_libraries(MAIN_EXEC
-  #    ${CMAKE_CURRENT_LIST_DIR}/libs/libglm.a
-  #  ${CMAKE_CURRENT_LIST_DIR}/libs/libglfw3.a
     glm
     glfw 
     assimp

@@ -1,5 +1,4 @@
 #include "CoreEntity.h"
-#include "CoreClass/MathConstants/MathContstants.hpp"
 
 core::CoreEntity::CoreEntity ()
 {
@@ -7,16 +6,16 @@ core::CoreEntity::CoreEntity ()
 
 core::CoreEntity::CoreEntity (Model::Model &model, glm::vec3 modelScale,
                               core::HitBox &hitbox, glm::vec3 hitboxScale,
-                              Shader &shader, core::MovementComponent mvcomp,
-                              core::RotationComponent rtcomp)
+                              Shader &shader, glm::quat rtcomp,
+                              glm::vec3 mvcomp)
 {
   this->mpModel = &model;
   this->mModelScale = modelScale;
   this->mpHitbox = &hitbox;
   this->mHitboxScale = hitboxScale;
   this->mpShader = &shader;
-  this->mMovComponent = mvcomp;
-  this->mRotComponent = rtcomp;
+  this->mPos = mvcomp;
+  this->mQuatRot = rtcomp;
 }
 
 core::CoreEntity::~CoreEntity ()
@@ -26,9 +25,6 @@ core::CoreEntity::~CoreEntity ()
 void
 core::CoreEntity::update (GLfloat deltaTime)
 {
-  this->mMovComponent.speed += this->mMovComponent.acc * deltaTime;
-  this->mMovComponent.pos += this->mMovComponent.speed * deltaTime;
-  this->mMovComponent.acc = { 0.0f, 0.0f, 0.0f };
 }
 
 const Shader *const
@@ -61,16 +57,16 @@ core::CoreEntity::getHitboxScale () const
   return &this->mHitboxScale;
 }
 
-const core::MovementComponent *const
-core::CoreEntity::getMovementComp () const
+const glm::vec3 *const
+core::CoreEntity::getPos () const
 {
-  return &this->mMovComponent;
+  return &this->mPos;
 }
 
-const core::RotationComponent *const
-core::CoreEntity::getRotationComp () const
+const glm::quat *const
+core::CoreEntity::getRot () const
 {
-  return &this->mRotComponent;
+  return &this->mQuatRot;
 }
 
 void
@@ -104,15 +100,15 @@ core::CoreEntity::setHitboxScale (const glm::vec3 &hitboxscale)
 }
 
 void
-core::CoreEntity::setMovementComp (const core::MovementComponent &mvcomp)
+core::CoreEntity::setPos (const glm::vec3 &mvcomp)
 {
-  this->mMovComponent = mvcomp;
+  this->mPos = mvcomp;
 }
 
 void
-core::CoreEntity::setRotationComp (const core::RotationComponent &rtcomp)
+core::CoreEntity::setRot (const glm::quat &rtcomp)
 {
-  this->mRotComponent = rtcomp;
+  this->mQuatRot = rtcomp;
 }
 
 //

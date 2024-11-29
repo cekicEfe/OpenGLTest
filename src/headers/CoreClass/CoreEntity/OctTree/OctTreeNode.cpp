@@ -1,87 +1,4 @@
-#include "OctTree.hpp"
-#include "CoreClass/CoreEntity/CoreEntity.h"
-#include <iostream>
-#include <memory>
-
-////////////////////
-// OctBox methods //
-////////////////////
-
-core::OctBox::OctBox ()
-{
-}
-core::OctBox::~OctBox ()
-{
-}
-core::OctBox::OctBox (glm::vec3 pos, GLfloat sqaureRadius)
-{
-  this->sqaureRadius = sqaureRadius;
-  this->position = pos;
-}
-
-///////////////////////////////
-// OctTreeNodeEntity methods //
-///////////////////////////////
-
-core::OctTreeNodeEntity::OctTreeNodeEntity (core::OctTreeNode *currentNode,
-                                            core::CoreEntity *entity)
-{
-  this->mCurrentOctTreeNode = currentNode;
-  this->mHeldEntity.reset (entity);
-}
-core::OctTreeNodeEntity::~OctTreeNodeEntity ()
-{
-  for (auto &elem : this->mReferences)
-    {
-      if (elem.get ()->ReturnReference () == this)
-        elem.get ()->mEntityReference = nullptr;
-    }
-}
-
-const core::CoreEntity *const
-core::OctTreeNodeEntity::returnEntity ()
-{
-  return this->mHeldEntity.get ();
-}
-
-void
-core::OctTreeNodeEntity::setHeldEntity (core::CoreEntity *entity)
-{
-  this->mHeldEntity.reset (entity);
-}
-
-void
-core::OctTreeNodeEntity::setCurrentOctTreeNode (core::OctTreeNode *node)
-{
-  this->mCurrentOctTreeNode = node;
-}
-
-const std::shared_ptr<core::OctTreeNodeEntityReference>
-core::OctTreeNodeEntity::createReference ()
-{
-  return std::make_shared<core::OctTreeNodeEntityReference> (
-      this->mHeldEntity.get ());
-}
-
-////////////////////////////////////////
-// OctTreeNodeEntityReference methods //
-////////////////////////////////////////
-
-core::OctTreeNodeEntityReference::OctTreeNodeEntityReference (
-    core::OctTreeNodeEntity *reference)
-{
-  this->mEntityReference = reference;
-}
-
-core::OctTreeNodeEntityReference::~OctTreeNodeEntityReference ()
-{
-}
-
-const core::OctTreeNodeEntity *const
-core::OctTreeNodeEntityReference::ReturnReference ()
-{
-  return this->mEntityReference;
-}
+#include "OctTreeNode.hpp"
 
 /////////////////////////
 // OctTreeNode methods //
@@ -190,8 +107,7 @@ core::OctTreeNode::insertEntity (core::CoreEntity *const entity)
 
   if (isSubdivided)
     {
-      glm::vec3 relativePos
-          = entity->getMovementComp ()->pos - this->Box.position;
+      glm::vec3 relativePos = *entity->getPos () - this->Box.position;
       GLint xdir = relativePos.x <= 0 ? 0 : 4;
       GLint ydir = relativePos.y <= 0 ? 0 : 2;
       GLint zdir = relativePos.z <= 0 ? 0 : 1;
@@ -201,49 +117,37 @@ core::OctTreeNode::insertEntity (core::CoreEntity *const entity)
     }
   else
     {
-      if (this->heldEntity.get ()->returnEntity () == nullptr)
+      if (this->heldEntity == nullptr)
         {
-          this->heldEntity->setHeldEntity (entity);
+          this->heldEntity = entity;
         }
-      else if (this->heldEntity.get ()->returnEntity () != nullptr)
+      else if (this->heldEntity != nullptr)
         {
-          if (this->heldEntity.get ()->returnEntity () == entity)
+          if (this->heldEntity == entity)
             {
               std::cout << "Duplicate entity" << std::endl;
             }
-          else if (this->heldEntity.get ()
-                       ->returnEntity ()
-                       ->getMovementComp ()
-                       ->pos
-                   == entity->getMovementComp ()->pos)
+          else if (*this->heldEntity->getPos () == *entity->getPos ())
             {
               std::cout << "Entities are at the same place" << std::endl;
             }
-          else if (((this->heldEntity.get ()
-                         ->returnEntity ()
-                         ->getMovementComp ()
-                         ->pos
-                     - entity->getMovementComp ()->pos)
+          else if (((*this->heldEntity->getPos () - *entity->getPos ())
                         .length ()
                     > 0.0001))
             {
               this->subdivide ();
-              auto ptr = this->heldEntity.get ();
+              auto ptr = this->heldEntity;
               this->heldEntity = nullptr;
 
-              glm::vec3 relativePos
-                  = ptr->returnEntity ()->getMovementComp ()->pos
-                    - this->Box.position;
+              glm::vec3 relativePos = *ptr->getPos () - this->Box.position;
               GLint xdir = relativePos.x <= 0 ? 0 : 4;
               GLint ydir = relativePos.y <= 0 ? 0 : 2;
               GLint zdir = relativePos.z <= 0 ? 0 : 1;
               GLint dir = (xdir + ydir + zdir);
 
-              this->Directions.at (dir)->insertEntity (
-                  this->heldEntity.get ());
+              this->Directions.at (dir)->insertEntity (this->heldEntity);
 
-              relativePos
-                  = entity->getMovementComp ()->pos - this->Box.position;
+              relativePos = *entity->getPos () - this->Box.position;
               xdir = relativePos.x <= 0 ? 0 : 4;
               ydir = relativePos.y <= 0 ? 0 : 2;
               zdir = relativePos.z <= 0 ? 0 : 1;
@@ -254,6 +158,7 @@ core::OctTreeNode::insertEntity (core::CoreEntity *const entity)
         }
     }
 }
+
 // Prints child nodes recursivly
 void
 core::OctTreeNode::printChildsRecursivly ()
