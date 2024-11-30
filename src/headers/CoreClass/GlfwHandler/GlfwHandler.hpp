@@ -14,14 +14,13 @@ namespace core
 class GlfwHandler
 {
 private:
-  static core::GlfwHandler *instance;
-
   GlfwHandler ();
   ~GlfwHandler ();
 
   GlfwHandler (GlfwHandler &other) = delete;
   void operator= (const GlfwHandler &) = delete;
 
+  static core::GlfwHandler *instance;
   core::WindowHandler windowHandler;
   core::ImGuiHandler imguiHandler;
 
@@ -36,15 +35,22 @@ public:
   static core::GlfwHandler *createInstance ();
   void deleteInstance ();
 
+  void initGlfw (
+      std::string windowName, WindowType type, GLuint SCR_WIDTH,
+      GLuint SCR_HEIGHT,
+      void (*frameSizeCallback) (GLFWwindow *window, int width, int height),
+      void (*mouseCallback) (GLFWwindow *window, double xposIn, double yposIn),
+      void (*scrollCallback) (GLFWwindow *window, double xoffset,
+                              double yoffset),
+      void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime),
+      int inputMode, int inputValue);
+  void terminateGlfw ();
+
   void startOfLoop (GLfloat deltaTime);
   void endOfLoop ();
 
-  const core::Window returnMainWindow ();
   GLuint checkWindowShouldClose ();
-
-  void initGlfw (std::string windowName, WindowType type, GLuint SCR_WIDTH,
-                 GLuint SCR_HEIGHT);
-  void terminateGlfw ();
+  const core::Window &returnMainWindow () const;
 
   void setMainWindowMouseCallback (void (*func) (GLFWwindow *window,
                                                  double xposIn,
@@ -55,7 +61,7 @@ public:
   void setMainWindowScrollCallback (void (*func) (GLFWwindow *window,
                                                   double xoffset,
                                                   double yoffset));
-  void setMainWindowInputMode (int type, int mode);
+  void setMainWindowInputMode (int mode, int value);
   void setMainWindowInputProcessor (void (*func) (GLFWwindow *window,
                                                   GLfloat deltaTime));
 };

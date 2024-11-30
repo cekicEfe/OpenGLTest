@@ -39,10 +39,10 @@ core::CoreEntity::getModel () const
   return this->mpModel;
 }
 
-const glm::vec3 *const
+const glm::vec3 &
 core::CoreEntity::getModelScale () const
 {
-  return &this->mModelScale;
+  return this->mModelScale;
 }
 
 const core::HitBox *const
@@ -51,22 +51,22 @@ core::CoreEntity::getHitbox () const
   return this->mpHitbox;
 }
 
-const glm::vec3 *const
+const glm::vec3 &
 core::CoreEntity::getHitboxScale () const
 {
-  return &this->mHitboxScale;
+  return this->mHitboxScale;
 }
 
-const glm::vec3 *const
+const glm::vec3 &
 core::CoreEntity::getPos () const
 {
-  return &this->mPos;
+  return this->mPos;
 }
 
-const glm::quat *const
+const glm::quat &
 core::CoreEntity::getRot () const
 {
-  return &this->mQuatRot;
+  return this->mQuatRot;
 }
 
 void

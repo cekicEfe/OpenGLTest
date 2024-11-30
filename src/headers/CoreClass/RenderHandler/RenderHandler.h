@@ -29,7 +29,8 @@ public:
   static const core::RenderHandler *const createInstance ();
   void deleteInstance () const;
   void DrawInstanced (
-      const GLuint &SCR_WIDTH, const GLuint &SCR_HEIGHT, const Camera &camera,
+      const GLuint &SCR_WIDTH, const GLuint &SCR_HEIGHT,
+      const Camera *camera = NULL,
       const std::vector<Model::Light> *const lights = NULL,
       const std::vector<std::unique_ptr<core::CoreEntity> > *const entities
       = NULL) const;

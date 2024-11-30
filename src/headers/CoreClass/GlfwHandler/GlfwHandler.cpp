@@ -45,8 +45,15 @@ core::GlfwHandler::deleteInstance ()
 }
 
 void
-core::GlfwHandler::initGlfw (std::string windowName, WindowType type,
-                             GLuint SCR_WIDTH, GLuint SCR_HEIGHT)
+core::GlfwHandler::initGlfw (
+    std::string windowName, WindowType type, GLuint SCR_WIDTH,
+    GLuint SCR_HEIGHT,
+    void (*frameSizeCallback) (GLFWwindow *window, int width, int height),
+    void (*mouseCallback) (GLFWwindow *window, double xposIn, double yposIn),
+    void (*scrollCallback) (GLFWwindow *window, double xoffset,
+                            double yoffset),
+    void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime),
+    int inputMode, int inputValue)
 {
   static GLuint initCallCount = 1;
 
@@ -72,11 +79,15 @@ core::GlfwHandler::initGlfw (std::string windowName, WindowType type,
 
       glfwMakeContextCurrent (this->windowHandler.returnMainGLFWWindow ());
 
-      this->setMainWindowFramebufferSizeCallback (nullptr);
-      this->setMainWindowMouseCallback (nullptr);
-      this->setMainWindowScrollCallback (nullptr);
-      this->setMainWindowInputMode (GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-      this->setMainWindowInputProcessor (nullptr);
+      // static auto defaultFramebufferSizeCallback
+      //     = [] (GLFWwindow *, int width, int height) {
+      //         glViewport (0, 0, width, height);
+      //       };
+      this->setMainWindowInputMode (inputMode, inputValue);
+      this->setMainWindowFramebufferSizeCallback (frameSizeCallback);
+      this->setMainWindowMouseCallback (mouseCallback);
+      this->setMainWindowScrollCallback (scrollCallback);
+      this->setMainWindowInputProcessor (inputProcessor);
 
       std::cout << "Initializing GLAD" << std::endl;
       if (!gladLoadGLLoader ((GLADloadproc)glfwGetProcAddress))
@@ -136,10 +147,16 @@ core::GlfwHandler::checkWindowShouldClose ()
   return glfwWindowShouldClose (this->windowHandler.returnMainGLFWWindow ());
 }
 
+const core::Window &
+core::GlfwHandler::returnMainWindow () const
+{
+  return this->windowHandler.mainWindow;
+}
+
 void
 core::GlfwHandler::setLoopVariables ()
 {
-  glClearColor (0.00f, 0.00f, 0.00f, 1.0f);
+  glClearColor (1.00f, 1.00f, 1.00f, 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glCullFace (GL_BACK);
 
@@ -185,9 +202,9 @@ core::GlfwHandler::setMainWindowScrollCallback (
 }
 
 void
-core::GlfwHandler::setMainWindowInputMode (int type, int mode)
+core::GlfwHandler::setMainWindowInputMode (int mode, int value)
 {
-  glfwSetInputMode (this->windowHandler.returnMainGLFWWindow (), type, mode);
+  glfwSetInputMode (this->windowHandler.returnMainGLFWWindow (), mode, value);
 }
 
 void

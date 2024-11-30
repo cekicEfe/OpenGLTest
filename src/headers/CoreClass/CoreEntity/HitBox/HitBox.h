@@ -15,7 +15,7 @@ private:
 
 public:
   HitBox ();
-  virtual ~HitBox () = 0;
+  virtual ~HitBox ();
 };
 } // namespace core
 

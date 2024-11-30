@@ -7,12 +7,14 @@
 #include <json/json.hpp>
 #include <string>
 
-namespace core {
-class JsonExtractor {
+namespace core
+{
+class JsonExtractor
+{
 public:
-  JsonExtractor();
-  ~JsonExtractor();
-  nlohmann::json *loadJsonFromPath(std::string path);
+  JsonExtractor ();
+  ~JsonExtractor ();
+  nlohmann::json *loadJsonFromPath (std::string path);
 };
 } // namespace core
 

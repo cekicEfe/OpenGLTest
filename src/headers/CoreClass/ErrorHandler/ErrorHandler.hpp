@@ -5,12 +5,14 @@
 #include <string>
 #include <utility>
 
-namespace core {
+namespace core
+{
 
-class ErrorHandler {
+class ErrorHandler
+{
 public:
-  static std::pair<int, std::string> ReturnOpenglError();
-  friend int ::main(int, char **);
+  static std::pair<int, std::string> ReturnOpenglError ();
+  friend int ::main (int, char **);
 };
 
 } // namespace core

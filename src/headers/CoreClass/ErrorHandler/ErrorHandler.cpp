@@ -4,16 +4,18 @@
 #include <memory.h>
 #include <utility>
 
-std::pair<int, std::string> core::ErrorHandler::ReturnOpenglError() {
+std::pair<int, std::string>
+core::ErrorHandler::ReturnOpenglError ()
+{
   const char *description;
-  int code = glfwGetError(&description);
+  int code = glfwGetError (&description);
 
   if (description)
     std::cout << "Error Code :" << code << "\n"
               << "Error Name :" << description << std::endl;
-  std::string newString(description);
+  std::string newString (description);
 
   delete description;
 
-  return std::pair<int, std::string>(code, newString);
+  return std::pair<int, std::string> (code, newString);
 };

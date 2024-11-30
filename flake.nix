@@ -30,8 +30,18 @@
 	  pkgs.valgrind
 	  pkgs.xorg.libX11
 	];
+	LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath[
+	 pkgs.glfw-wayland
+	 pkgs.xorg.libX11
+	 pkgs.glm
+	 pkgs.assimp
+	 pkgs.freetype
+	 pkgs.libpng
+	 pkgs.wayland
+	 pkgs.libxkbcommon
+	 pkgs.libGL
+	];
       shellHook = ''
-	export LD_LIBRARY_PATH=${pkgs.glfw-wayland}/lib:${pkgs.xorg.libX11}/lib:${pkgs.glm}/lib:${pkgs.assimp}/lib:${pkgs.freetype}/lib:${pkgs.libpng}/lib:${pkgs.wayland}/lib:${pkgs.libxkbcommon}/lib:${pkgs.libGL}/lib:$LD_LIBRARY_PATH
 	echo "OpenGL development environment is ready!"
         PS1="[\\u@\\h && OPENGL-DEV-ENV:\\w]\$ "
 	'';
