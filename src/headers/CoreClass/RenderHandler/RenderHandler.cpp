@@ -1,8 +1,6 @@
 #include "RenderHandler.h"
 #include <glm/glm.hpp>
 
-core::RenderHandler *core::RenderHandler::instance = nullptr;
-
 core::RenderHandler::RenderHandler ()
 {
   std::cout << "Called RenderHandler Constructor" << std::endl;
@@ -11,56 +9,22 @@ core::RenderHandler::RenderHandler ()
 core::RenderHandler::~RenderHandler ()
 {
   std::cout << "Called RenderHandler DEconstructor" << std::endl;
-  this->instance = nullptr;
-}
-
-core::RenderHandler const *const
-core::RenderHandler::createInstance ()
-{
-  if (core::RenderHandler::instance == nullptr)
-    {
-      std::cout << "Creating a renderHandler Instance" << std::endl;
-      core::RenderHandler::instance = new core::RenderHandler ();
-      return instance;
-    }
-  else
-    {
-      std::cout << "A renderHandler already exists" << std::endl;
-      return nullptr;
-    }
-}
-
-void
-core::RenderHandler::deleteInstance () const
-{
-  if (core::RenderHandler::instance == nullptr)
-    {
-      std::cout << "No renderHandler exists to delete" << std::endl;
-    }
-  else
-    {
-      std::cout << "Deleting render handler" << std::endl;
-      delete core::RenderHandler::instance;
-      core::RenderHandler::instance = nullptr;
-    }
 }
 
 void
 core::RenderHandler::DrawInstanced (
     const GLuint &SCR_WIDTH, const GLuint &SCR_HEIGHT, const Camera *camera,
     const std::vector<Model::Light> *const lights,
-    const std::vector<std::unique_ptr<core::CoreEntity> > *const entities)
-    const
+    const core::CoreEntity *const entities, const size_t entities_size) const
 {
   if (lights != NULL && entities != NULL && (lights->size () > 0)
-      && (entities->size () > 0))
+      && (entities_size > 0))
     {
-      for (size_t i = 0; i < entities->size (); i++)
+      for (size_t i = 0; i < entities_size; i++)
         {
           static const Model::Model *batchLeaderModel
-              = entities->at (i).get ()->getModel ();
-          static const Shader *batchLeaderShader
-              = entities->at (i).get ()->getShader ();
+              = entities[i].getModel ();
+          static const Shader *batchLeaderShader = entities[i].getShader ();
           static std::vector<glm::mat4> modelMatrices;
 
           static auto draw = [&] () {
@@ -143,17 +107,18 @@ core::RenderHandler::DrawInstanced (
             glDeleteBuffers (1, &buffer);
           };
 
-          if (i != entities->size () - 1)
+          // changed here !!!
+          if (i != entities_size - 1)
             {
-              if (batchLeaderModel == entities->at (i)->getModel ()
-                  && batchLeaderShader == entities->at (i)->getShader ())
+              if (batchLeaderModel == entities[i].getModel ()
+                  && batchLeaderShader == entities[i].getShader ())
                 {
                   glm::mat4 modelMatrix = glm::mat4 (1.0);
-                  modelMatrix = glm::translate (
-                      modelMatrix, entities->at (i).get ()->getPos ());
-                  modelMatrix = glm::scale (
-                      modelMatrix, entities->at (i).get ()->getModelScale ());
-                  auto &rot = entities->at (i).get ()->getRot ();
+                  modelMatrix
+                      = glm::translate (modelMatrix, entities[i].getPos ());
+                  modelMatrix
+                      = glm::scale (modelMatrix, entities[i].getModelScale ());
+                  auto &rot = entities[i].getRot ();
                   // modelMatrix
                   //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y,
                   //     rot.z
@@ -165,15 +130,15 @@ core::RenderHandler::DrawInstanced (
                   draw ();
                   modelMatrices.clear ();
 
-                  batchLeaderModel = entities->at (i)->getModel ();
-                  batchLeaderShader = entities->at (i)->getShader ();
+                  batchLeaderModel = entities[i].getModel ();
+                  batchLeaderShader = entities[i].getShader ();
 
                   glm::mat4 modelMatrix = glm::mat4 (1.0);
-                  modelMatrix = glm::translate (
-                      modelMatrix, entities->at (i).get ()->getPos ());
-                  modelMatrix = glm::scale (
-                      modelMatrix, entities->at (i).get ()->getModelScale ());
-                  auto &rot = entities->at (i).get ()->getRot ();
+                  modelMatrix
+                      = glm::translate (modelMatrix, entities[i].getPos ());
+                  modelMatrix
+                      = glm::scale (modelMatrix, entities[i].getModelScale ());
+                  auto &rot = entities[i].getRot ();
                   // modelMatrix
                   //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y,
                   //     rot.z
@@ -183,15 +148,15 @@ core::RenderHandler::DrawInstanced (
             }
           else
             {
-              if (batchLeaderModel == entities->at (i)->getModel ()
-                  && batchLeaderShader == entities->at (i)->getShader ())
+              if (batchLeaderModel == entities[i].getModel ()
+                  && batchLeaderShader == entities[i].getShader ())
                 {
                   glm::mat4 modelMatrix = glm::mat4 (1.0);
-                  modelMatrix = glm::translate (
-                      modelMatrix, entities->at (i).get ()->getPos ());
-                  modelMatrix = glm::scale (
-                      modelMatrix, entities->at (i).get ()->getModelScale ());
-                  auto &rot = entities->at (i).get ()->getRot ();
+                  modelMatrix
+                      = glm::translate (modelMatrix, entities[i].getPos ());
+                  modelMatrix
+                      = glm::scale (modelMatrix, entities[i].getModelScale ());
+                  auto &rot = entities[i].getRot ();
                   // modelMatrix
                   //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y,
                   //     rot.z
@@ -207,11 +172,11 @@ core::RenderHandler::DrawInstanced (
                   modelMatrices.clear ();
 
                   glm::mat4 modelMatrix = glm::mat4 (1.0);
-                  modelMatrix = glm::translate (
-                      modelMatrix, entities->at (i).get ()->getPos ());
-                  modelMatrix = glm::scale (
-                      modelMatrix, entities->at (i).get ()->getModelScale ());
-                  auto &rot = entities->at (i).get ()->getRot ();
+                  modelMatrix
+                      = glm::translate (modelMatrix, entities[i].getPos ());
+                  modelMatrix
+                      = glm::scale (modelMatrix, entities[i].getModelScale ());
+                  auto &rot = entities[i].getRot ();
                   // modelMatrix
                   //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y,
                   //     rot.z
@@ -225,20 +190,20 @@ core::RenderHandler::DrawInstanced (
         }
 
       /*
-        for (size_t i = 0; i < entities->size (); i++)
+        for (size_t i = 0; i < entities[i].size (); i++)
           {
             static const Model::Model *batchLeadermodel
-                = entities->at (i).get ()->getModel ();
+                = entities[i].at (i).get ()->getModel ();
             static const Shader *batchLeadershader
-                = entities->at (i).get ()->getShader ();
+                = entities[i].at (i).get ()->getShader ();
             static bool initBatch = true;
             static std::vector<glm::mat4> modelMatrices;
 
             if (initBatch)
               {
 
-                batchLeadermodel = entities->at (i).get ()->getModel ();
-                batchLeadershader = entities->at (i).get ()->getShader ();
+                batchLeadermodel = entities[i].at (i).get ()->getModel ();
+                batchLeadershader = entities[i].at (i).get ()->getShader ();
                 modelMatrices.clear ();
 
                 glm::mat4 projection = glm::perspective (
@@ -265,19 +230,19 @@ core::RenderHandler::DrawInstanced (
                 initBatch = false;
               }
 
-            else if (((batchLeadermodel != entities->at (i).get ()->getModel
+            else if (((batchLeadermodel != entities[i].at (i).get ()->getModel
         ())
                       || (batchLeadershader
-                          != entities->at (i).get ()->getShader ())
-                      || (i + 1 == entities->size ()))
+                          != entities[i].at (i).get ()->getShader ())
+                      || (i + 1 == entities[i].size ()))
                      && !initBatch)
               {
                 glm::mat4 modelMatrix = glm::mat4 (1.0);
                 modelMatrix = glm::translate (
-                    modelMatrix, entities->at (i).get ()->getPos ());
+                    modelMatrix, entities[i].at (i).get ()->getPos ());
                 modelMatrix = glm::scale (
-                    modelMatrix, entities->at (i).get ()->getModelScale ());
-                auto &rot = entities->at (i).get ()->getRot ();
+                    modelMatrix, entities[i].at (i).get ()->getModelScale ());
+                auto &rot = entities[i].at (i).get ()->getRot ();
                 // modelMatrix
                 //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y, rot.z
                 //     });
@@ -291,11 +256,11 @@ core::RenderHandler::DrawInstanced (
                               modelMatrices.data (), GL_STATIC_DRAW);
 
                 for (GLuint j = 0;
-                     j < entities->at (i).get ()->getModel ()->Meshes.size ();
-                     j++)
+                     j < entities[i].at (i).get ()->getModel ()->Meshes.size
+        (); j++)
                   {
                     GLuint VAO
-                        = entities->at (i).get ()->getModel
+                        = entities[i].at (i).get ()->getModel
         ()->Meshes[j].vao.id; glBindVertexArray (VAO);
 
                     glEnableVertexAttribArray (4);
@@ -325,26 +290,26 @@ core::RenderHandler::DrawInstanced (
                 // Draws objects here
                 batchLeadershader->use ();
                 for (GLuint g = 0;
-                     g < entities->at (i).get ()->getModel ()->Meshes.size ();
-                     g++)
+                     g < entities[i].at (i).get ()->getModel ()->Meshes.size
+        (); g++)
                   {
-                    if (entities->at (i).get ()->getModel ()->HasTexture ())
+                    if (entities[i].at (i).get ()->getModel ()->HasTexture ())
                       {
                         glActiveTexture (GL_TEXTURE0);
-                        glBindTexture (GL_TEXTURE_2D, entities->at (i)
+                        glBindTexture (GL_TEXTURE_2D, entities[i].at (i)
                                                           .get ()
                                                           ->getModel ()
                                                           ->Textures.at (0)
                                                           .ID);
                       }
-                    glBindVertexArray (entities->at (i)
+                    glBindVertexArray (entities[i].at (i)
                                            .get ()
                                            ->getModel ()
                                            ->Meshes.at (g)
                                            .vao.id);
                     glDrawElementsInstanced (
                         GL_TRIANGLES,
-                        static_cast<GLuint> (entities->at (i)
+                        static_cast<GLuint> (entities[i].at (i)
                                                  .get ()
                                                  ->getModel ()
                                                  ->Meshes.at (g)
@@ -359,10 +324,10 @@ core::RenderHandler::DrawInstanced (
               {
                 glm::mat4 modelMatrix = glm::mat4 (1.0);
                 modelMatrix = glm::translate (
-                    modelMatrix, entities->at (i).get ()->getPos ());
+                    modelMatrix, entities[i].at (i).get ()->getPos ());
                 modelMatrix = glm::scale (
-                    modelMatrix, entities->at (i).get ()->getModelScale ());
-                auto &rot = entities->at (i).get ()->getRot ();
+                    modelMatrix, entities[i].at (i).get ()->getModelScale ());
+                auto &rot = entities[i].at (i).get ()->getRot ();
                 // modelMatrix
                 //     = glm::rotate (modelMatrix, rot.w, { rot.x, rot.y, rot.z
                 //     });

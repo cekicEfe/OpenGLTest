@@ -1,59 +1,24 @@
 #include "GlfwHandler.hpp"
 #include "glfw3.h"
 
-core::GlfwHandler *core::GlfwHandler::instance = nullptr;
-
 core::GlfwHandler::GlfwHandler ()
 {
 }
 
 core::GlfwHandler::~GlfwHandler ()
 {
-}
-
-core::GlfwHandler *
-core::GlfwHandler::createInstance ()
-{
-  std::cout << "Creating glfwHandler instance" << std::endl;
-  if (core::GlfwHandler::instance == nullptr)
-    {
-      std::cout << "Returning Instance" << std::endl;
-      core::GlfwHandler::instance = new core::GlfwHandler ();
-      return instance;
-    }
-  else
-    {
-      std::cout << "Instance already exists" << std::endl;
-      return nullptr;
-    }
-}
-
-void
-core::GlfwHandler::deleteInstance ()
-{
-  std::cout << "Starting to delete glfwInstance" << std::endl;
-  if (core::GlfwHandler::instance != nullptr)
-    {
-      std::cout << "glfwInstance deleted succesfully" << std::endl;
-      delete this->instance;
-      this->instance = nullptr;
-    }
-  else
-    {
-      std::cout << "glfwInstance is not initialized" << std::endl;
-    }
+  this->terminateGlfw ();
 }
 
 void
 core::GlfwHandler::initGlfw (
     std::string windowName, WindowType type, GLuint SCR_WIDTH,
-    GLuint SCR_HEIGHT,
+    GLuint SCR_HEIGHT, int inputMode, int inputValue,
     void (*frameSizeCallback) (GLFWwindow *window, int width, int height),
     void (*mouseCallback) (GLFWwindow *window, double xposIn, double yposIn),
     void (*scrollCallback) (GLFWwindow *window, double xoffset,
                             double yoffset),
-    void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime),
-    int inputMode, int inputValue)
+    void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime))
 {
   static GLuint initCallCount = 1;
 
@@ -123,8 +88,9 @@ core::GlfwHandler::terminateGlfw ()
 void
 core::GlfwHandler::processInput (GLfloat deltaTime)
 {
-  if (this->func != nullptr)
-    (*this->func) (this->windowHandler.returnMainGLFWWindow (), deltaTime);
+  if (this->inputProcessor != nullptr)
+    (*this->inputProcessor) (this->windowHandler.returnMainGLFWWindow (),
+                             deltaTime);
 }
 
 void
@@ -150,13 +116,13 @@ core::GlfwHandler::checkWindowShouldClose ()
 const core::Window &
 core::GlfwHandler::returnMainWindow () const
 {
-  return this->windowHandler.mainWindow;
+  return this->windowHandler.returnMainWindow ();
 }
 
 void
 core::GlfwHandler::setLoopVariables ()
 {
-  glClearColor (1.00f, 1.00f, 1.00f, 1.0f);
+  glClearColor (0.20f, 0.20f, 0.20f, 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glCullFace (GL_BACK);
 
@@ -211,5 +177,5 @@ void
 core::GlfwHandler::setMainWindowInputProcessor (
     void (*func) (GLFWwindow *window, GLfloat deltaTime))
 {
-  this->func = func;
+  this->inputProcessor = func;
 }

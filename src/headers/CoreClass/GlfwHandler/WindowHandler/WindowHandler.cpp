@@ -36,7 +36,7 @@ core::WindowHandler::returnMainGLFWWindow ()
 }
 
 const core::Window &
-core::WindowHandler::returnMainWindow ()
+core::WindowHandler::returnMainWindow () const
 {
 
   return this->mainWindow;

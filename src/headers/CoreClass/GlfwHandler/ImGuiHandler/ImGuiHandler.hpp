@@ -3,9 +3,10 @@
 
 #include <CoreClass/CoreClassPreDec.h>
 #include <GLFW/glfw3.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/imgui.h>
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace core
 {
@@ -13,19 +14,20 @@ namespace core
 class ImGuiHandler
 {
 private:
-  ImGuiHandler ();
-  ~ImGuiHandler ();
-
   ImGuiHandler (ImGuiHandler &other) = delete;
   void operator= (const ImGuiHandler &) = delete;
+
+public:
+  ImGuiHandler ();
+  /*
+   * DEconstructor calls terminateImgui
+   */
+  ~ImGuiHandler ();
 
   void initImGui (GLFWwindow *window) const;
   void initLoop ();
   void render ();
   void terminateImgui ();
-
-public:
-  friend class core::GlfwHandler;
 };
 } // namespace core
 

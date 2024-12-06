@@ -6,7 +6,7 @@
 #include <model/Model.h>
 #include <vector>
 
-namespace core
+namespace testgame
 {
 class HitBox
 {

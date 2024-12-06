@@ -14,37 +14,40 @@ namespace core
 class GlfwHandler
 {
 private:
-  GlfwHandler ();
-  ~GlfwHandler ();
-
   GlfwHandler (GlfwHandler &other) = delete;
   void operator= (const GlfwHandler &) = delete;
 
-  static core::GlfwHandler *instance;
   core::WindowHandler windowHandler;
   core::ImGuiHandler imguiHandler;
 
-  void (*func) (GLFWwindow *window, GLfloat deltaTime) = nullptr;
+  void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime) = nullptr;
 
   void setLoopVariables ();
   void swapBuffers ();
   void pollEvents ();
   void processInput (GLfloat deltaTime);
+  void terminateGlfw ();
 
 public:
-  static core::GlfwHandler *createInstance ();
-  void deleteInstance ();
+  GlfwHandler ();
+  /*
+   *DEconstructor calls terminateGlfw !!!
+   */
+  ~GlfwHandler ();
 
-  void initGlfw (
-      std::string windowName, WindowType type, GLuint SCR_WIDTH,
-      GLuint SCR_HEIGHT,
-      void (*frameSizeCallback) (GLFWwindow *window, int width, int height),
-      void (*mouseCallback) (GLFWwindow *window, double xposIn, double yposIn),
-      void (*scrollCallback) (GLFWwindow *window, double xoffset,
-                              double yoffset),
-      void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime),
-      int inputMode, int inputValue);
-  void terminateGlfw ();
+  void initGlfw (std::string windowName, WindowType type, GLuint SCR_WIDTH,
+                 GLuint SCR_HEIGHT, int inputMode, int inputValue,
+                 void (*frameSizeCallback) (GLFWwindow *window, int width,
+                                            int height)
+                 = nullptr,
+                 void (*mouseCallback) (GLFWwindow *window, double xposIn,
+                                        double yposIn)
+                 = nullptr,
+                 void (*scrollCallback) (GLFWwindow *window, double xoffset,
+                                         double yoffset)
+                 = nullptr,
+                 void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime)
+                 = nullptr);
 
   void startOfLoop (GLfloat deltaTime);
   void endOfLoop ();

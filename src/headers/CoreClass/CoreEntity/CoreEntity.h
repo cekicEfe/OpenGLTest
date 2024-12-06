@@ -2,7 +2,6 @@
 #define COREOBJECT_H
 
 #include <CoreClass/CoreClassPreDec.h>
-#include <CoreClass/CoreEntity/HitBox/HitBox.h>
 #include <glm/gtc/quaternion.hpp>
 #include <json/json.hpp>
 #include <model/Model.h>
@@ -18,17 +17,13 @@ private:
   Model::Model *mpModel = nullptr;
   glm::vec3 mModelScale = glm::vec3 (1.0f, 1.0f, 1.0f);
 
-  core::HitBox *mpHitbox = nullptr;
-  glm::vec3 mHitboxScale = glm::vec3 (1.0f, 1.0f, 1.0f);
-
   glm::vec3 mPos = glm::vec3 (0.0f, 0.0f, 0.0f);
   glm::quat mQuatRot = glm::quat (1.0f, { 0.0f, 0.0f, 0.0f });
 
 public:
   CoreEntity ();
-  CoreEntity (Model::Model &model, glm::vec3 modelScale, core::HitBox &hitbox,
-              glm::vec3 hitboxScale, Shader &shader, glm::quat rot,
-              glm::vec3 pos);
+  CoreEntity (Model::Model &model, glm::vec3 modelScale, Shader &shader,
+              glm::quat rot, glm::vec3 pos);
   virtual ~CoreEntity ();
 
   virtual void update (GLfloat deltaTime);
@@ -36,16 +31,12 @@ public:
   const Shader *const getShader () const;
   const Model::Model *const getModel () const;
   const glm::vec3 &getModelScale () const;
-  const core::HitBox *const getHitbox () const;
-  const glm::vec3 &getHitboxScale () const;
   const glm::vec3 &getPos () const;
   const glm::quat &getRot () const;
 
   void setShader (Shader *const shader);
   void setModel (Model::Model *const modelptr);
   void setModelScale (const glm::vec3 &modelScale);
-  void setHitbox (core::HitBox *const hitboxptr);
-  void setHitboxScale (const glm::vec3 &hitboxscale);
   void setPos (const glm::vec3 &pos);
   void setRot (const glm::quat &quat);
 };

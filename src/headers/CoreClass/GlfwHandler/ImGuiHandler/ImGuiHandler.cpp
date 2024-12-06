@@ -5,6 +5,7 @@ core::ImGuiHandler::ImGuiHandler ()
 }
 core::ImGuiHandler::~ImGuiHandler ()
 {
+  this->terminateImgui ();
 }
 
 void

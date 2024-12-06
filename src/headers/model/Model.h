@@ -80,7 +80,6 @@ public:
 class Light
 {
 public:
-  virtual nlohmann::json saveAsJson ();
   glm::vec3 light_color;
   glm::vec3 light_pos;
   GLfloat ambient = 0;

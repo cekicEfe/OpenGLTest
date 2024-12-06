@@ -5,14 +5,11 @@ core::CoreEntity::CoreEntity ()
 }
 
 core::CoreEntity::CoreEntity (Model::Model &model, glm::vec3 modelScale,
-                              core::HitBox &hitbox, glm::vec3 hitboxScale,
                               Shader &shader, glm::quat rtcomp,
                               glm::vec3 mvcomp)
 {
   this->mpModel = &model;
   this->mModelScale = modelScale;
-  this->mpHitbox = &hitbox;
-  this->mHitboxScale = hitboxScale;
   this->mpShader = &shader;
   this->mPos = mvcomp;
   this->mQuatRot = rtcomp;
@@ -45,18 +42,6 @@ core::CoreEntity::getModelScale () const
   return this->mModelScale;
 }
 
-const core::HitBox *const
-core::CoreEntity::getHitbox () const
-{
-  return this->mpHitbox;
-}
-
-const glm::vec3 &
-core::CoreEntity::getHitboxScale () const
-{
-  return this->mHitboxScale;
-}
-
 const glm::vec3 &
 core::CoreEntity::getPos () const
 {
@@ -85,18 +70,6 @@ void
 core::CoreEntity::setModelScale (const glm::vec3 &modelScale)
 {
   this->mModelScale = modelScale;
-}
-
-void
-core::CoreEntity::setHitbox (core::HitBox *const hitboxptr)
-{
-  this->mpHitbox = hitboxptr;
-}
-
-void
-core::CoreEntity::setHitboxScale (const glm::vec3 &hitboxscale)
-{
-  this->mHitboxScale = hitboxscale;
 }
 
 void

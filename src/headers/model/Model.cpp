@@ -89,25 +89,6 @@ Model::Mesh::Draw (Shader &shader)
       this->vao.Unbind ();
     }
 }
-
-nlohmann::json
-Model::Light::saveAsJson ()
-{
-  nlohmann::json lightJson;
-
-  lightJson["Light Color"]
-      = { this->light_color.x, this->light_color.y, this->light_color.z };
-
-  lightJson["Light Position"]
-      = { this->light_pos.x, this->light_pos.y, this->light_pos.z };
-
-  lightJson["Ambient"] = this->ambient;
-  lightJson["Diffuse"] = this->diffuse;
-  lightJson["Specular"] = this->specular;
-
-  return lightJson;
-}
-
 /*
  * tModel methods:
  *

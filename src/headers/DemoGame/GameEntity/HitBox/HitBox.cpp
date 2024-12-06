@@ -1,9 +1,9 @@
 #include "HitBox.h"
 
 // Generates a Hitbox by sorting through nodes
-core::HitBox::HitBox ()
+testgame::HitBox::HitBox ()
 {
 }
-core::HitBox::~HitBox ()
+testgame::HitBox::~HitBox ()
 {
 }
