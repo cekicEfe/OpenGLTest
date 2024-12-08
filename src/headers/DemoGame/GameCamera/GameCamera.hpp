@@ -17,6 +17,13 @@ public:
               float pitch = PITCH, bool isStopped = true);
   ~GameCamera ();
 
+  /*
+    we use this to determine that
+    the camera should be changed or not
+    true for no
+    false for yes
+    (kinda sucks but man);
+  */
   void setStatus (bool status);
   bool returnStatus () const;
 };

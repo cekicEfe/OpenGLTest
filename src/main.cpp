@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <exception>
 #include <glad/glad.h>
 //
 #include <GLFW/glfw3.h>
@@ -15,8 +15,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "CoreClass/CoreEntity/CoreEntity.h"
-#include "DemoGame/GameEntity/GameEntity.hpp"
 #include "DemoGame/GameHandler/GameHandler.hpp"
 #include <CoreClass/ErrorHandler/ErrorHandler.hpp>
 #include <CoreClass/GlfwHandler/GlfwHandler.hpp>
@@ -24,6 +22,7 @@
 #include <CoreClass/RenderHandler/RenderHandler.h>
 
 #include <iostream>
+#include <stdexcept>
 
 using namespace testgame;
 using namespace core;
@@ -44,43 +43,43 @@ main (int argc, char **argv)
     {
       while (!glfwHandler.checkWindowShouldClose ())
         {
-          glfwHandler.startOfLoop (0.1);
+          static GLfloat deltaTime;
+          deltaTime = gameHandler.calculateDeltaTime ();
+
+          gameHandler.update (deltaTime);
+          glfwHandler.startOfLoop (deltaTime);
+
           ImGui::ShowDemoWindow ();
 
           {
             ImGui::Begin ("Close program");
             if (ImGui::Button ("Close"))
               {
-                exit (EXIT_SUCCESS);
+                glfwHandler.terminateGlfw ();
+                return 0;
               }
             ImGui::End ();
           }
 
-          {
-            ImGui::Begin ("Camera things");
-
-            ImGui::End ();
-          }
-
-          /*
-            Do & Render here !!!
-          */
-          //         renderHandler->DrawInstanced (
-          //             glfwHandler->returnMainWindow ().getScrWidth (),
-          //             glfwHandler->returnMainWindow ().getScrHeight (),
-          //             &cameraTest, &lights, entities.data (), entities.size
-          //             ());
+          renderHandler.DrawInstanced (
+              glfwHandler.returnMainWindow ().getScrWidth (),
+              glfwHandler.returnMainWindow ().getScrHeight (),
+              gameHandler.returnCamera (), gameHandler.returnLights (),
+              gameHandler.returnLightsSize (), gameHandler.returnEntities (),
+              gameHandler.returnEntitiesSize ());
 
           glfwHandler.endOfLoop ();
         }
     }
-  catch (...)
+  catch (std::exception &e)
     {
+      std::cout << "Error : " << e.what () << std::endl;
       std::cout << "Program closed unexpectedly" << std::endl;
-      std::cout << "Bad bye" << std::endl;
       return -1;
     }
   std::cout << "Good bye" << std::endl;
+
+  glfwHandler.terminateGlfw ();
 
   return 0;
 }

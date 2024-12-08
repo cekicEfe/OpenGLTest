@@ -20,7 +20,8 @@ public:
 
   void DrawInstanced (const GLuint &SCR_WIDTH, const GLuint &SCR_HEIGHT,
                       const Camera *camera = NULL,
-                      const std::vector<Model::Light> *const lights = NULL,
+                      const Model::Light *const lights = NULL,
+                      const size_t lights_size = 0,
                       const core::CoreEntity *const entities = nullptr,
                       const size_t entities_size = 0) const;
 };

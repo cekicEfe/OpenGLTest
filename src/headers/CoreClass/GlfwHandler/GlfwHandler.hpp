@@ -26,7 +26,6 @@ private:
   void swapBuffers ();
   void pollEvents ();
   void processInput (GLfloat deltaTime);
-  void terminateGlfw ();
 
 public:
   GlfwHandler ();
@@ -49,6 +48,7 @@ public:
                  void (*inputProcessor) (GLFWwindow *window, GLfloat deltaTime)
                  = nullptr);
 
+  void terminateGlfw ();
   void startOfLoop (GLfloat deltaTime);
   void endOfLoop ();
 

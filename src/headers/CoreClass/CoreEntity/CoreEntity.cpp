@@ -1,18 +1,20 @@
 #include "CoreEntity.h"
+#include "glm/ext/quaternion_transform.hpp"
 
 core::CoreEntity::CoreEntity ()
 {
 }
 
 core::CoreEntity::CoreEntity (Model::Model &model, glm::vec3 modelScale,
-                              Shader &shader, glm::quat rtcomp,
+                              Shader &shader, glm::vec3 rtcomp, GLfloat rotrad,
                               glm::vec3 mvcomp)
 {
   this->mpModel = &model;
   this->mModelScale = modelScale;
   this->mpShader = &shader;
   this->mPos = mvcomp;
-  this->mQuatRot = rtcomp;
+  this->mRotAxis = rtcomp;
+  this->mRotRad = rotrad;
 }
 
 core::CoreEntity::~CoreEntity ()
@@ -48,10 +50,16 @@ core::CoreEntity::getPos () const
   return this->mPos;
 }
 
-const glm::quat &
-core::CoreEntity::getRot () const
+const glm::vec3 &
+core::CoreEntity::getRotAxis () const
 {
-  return this->mQuatRot;
+  return this->mRotAxis;
+}
+
+const GLfloat &
+core::CoreEntity::getRotRad () const
+{
+  return this->mRotRad;
 }
 
 void
@@ -79,9 +87,29 @@ core::CoreEntity::setPos (const glm::vec3 &mvcomp)
 }
 
 void
-core::CoreEntity::setRot (const glm::quat &rtcomp)
+core::CoreEntity::setRotAxis (const glm::vec3 &rtaxis)
 {
-  this->mQuatRot = rtcomp;
+  this->mRotAxis = rtaxis;
 }
 
+void
+core::CoreEntity::setRotRad (const GLfloat &rotRad)
+{
+  this->mRotRad = rotRad;
+}
+
+const glm::mat4 &
+core::CoreEntity::getUniformAlignment () const
+{
+  // If for some godforsaken reason this
+  // is used in a multi-threaded manner
+  // so the threads does not "fuck up" hopefully
+  // (Horrible)
+  thread_local static glm::mat4 modelMatrix;
+  modelMatrix = glm::mat4 (1.0);
+  modelMatrix = glm::translate (modelMatrix, this->mPos);
+  modelMatrix = glm::scale (modelMatrix, this->mModelScale);
+  modelMatrix = glm::rotate (modelMatrix, this->mRotRad, this->mRotAxis);
+  return modelMatrix;
+}
 //

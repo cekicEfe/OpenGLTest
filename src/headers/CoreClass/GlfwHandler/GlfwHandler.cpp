@@ -7,7 +7,6 @@ core::GlfwHandler::GlfwHandler ()
 
 core::GlfwHandler::~GlfwHandler ()
 {
-  this->terminateGlfw ();
 }
 
 void

@@ -11,19 +11,20 @@ namespace core
 
 class CoreEntity
 {
-private:
+protected:
   Shader *mpShader = nullptr;
 
   Model::Model *mpModel = nullptr;
   glm::vec3 mModelScale = glm::vec3 (1.0f, 1.0f, 1.0f);
 
   glm::vec3 mPos = glm::vec3 (0.0f, 0.0f, 0.0f);
-  glm::quat mQuatRot = glm::quat (1.0f, { 0.0f, 0.0f, 0.0f });
+  glm::vec3 mRotAxis = glm::vec3 (0.0f, 1.0f, 0.0f);
+  GLfloat mRotRad = 0;
 
 public:
   CoreEntity ();
   CoreEntity (Model::Model &model, glm::vec3 modelScale, Shader &shader,
-              glm::quat rot, glm::vec3 pos);
+              glm::vec3 rot, GLfloat rotrad, glm::vec3 pos);
   virtual ~CoreEntity ();
 
   virtual void update (GLfloat deltaTime);
@@ -32,13 +33,16 @@ public:
   const Model::Model *const getModel () const;
   const glm::vec3 &getModelScale () const;
   const glm::vec3 &getPos () const;
-  const glm::quat &getRot () const;
+  const glm::vec3 &getRotAxis () const;
+  const GLfloat &getRotRad () const;
+  const glm::mat4 &getUniformAlignment () const;
 
   void setShader (Shader *const shader);
   void setModel (Model::Model *const modelptr);
   void setModelScale (const glm::vec3 &modelScale);
   void setPos (const glm::vec3 &pos);
-  void setRot (const glm::quat &quat);
+  void setRotAxis (const glm::vec3 &rotAxis);
+  void setRotRad (const GLfloat &rotRad);
 };
 
 } // namespace core

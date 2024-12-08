@@ -19,9 +19,6 @@ private:
 
 public:
   ImGuiHandler ();
-  /*
-   * DEconstructor calls terminateImgui
-   */
   ~ImGuiHandler ();
 
   void initImGui (GLFWwindow *window) const;

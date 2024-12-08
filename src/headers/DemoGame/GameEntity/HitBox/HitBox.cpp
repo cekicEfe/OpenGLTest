@@ -4,6 +4,12 @@
 testgame::HitBox::HitBox ()
 {
 }
+
 testgame::HitBox::~HitBox ()
 {
+}
+
+testgame::HitBox::HitBox (std::string hitboxName)
+{
+  this->hitboxName = hitboxName;
 }

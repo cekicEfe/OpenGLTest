@@ -1,11 +1,12 @@
 #include "GameCamera.hpp"
 
 testgame::GameCamera::GameCamera (glm::vec3 position, glm::vec3 up, float yaw,
-                                  float pitch, bool isStopped)
+                                  float pitch, bool stopCamera)
     : Camera (position, up, yaw, pitch)
 {
-  this->stopCamera = isStopped;
+  this->stopCamera = stopCamera;
 }
+
 testgame::GameCamera::~GameCamera ()
 {
 }

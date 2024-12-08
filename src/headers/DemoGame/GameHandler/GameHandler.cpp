@@ -13,12 +13,6 @@ GameHandler::~GameHandler ()
 {
 }
 
-Camera const &
-GameHandler::returnCamera () const
-{
-  return this->mainCamera;
-}
-
 const testgame::GameEntity *const
 GameHandler::returnEntities () const
 {
@@ -31,10 +25,27 @@ GameHandler::returnEntitiesSize () const
   return this->entities.size ();
 }
 
-const std::vector<Model::Light> &
+const Model::Light *const
 GameHandler::returnLights () const
 {
-  return this->lights;
+  return this->lights.data ();
+}
+
+const size_t
+GameHandler::returnLightsSize () const
+{
+  return this->lights.size ();
+}
+
+Camera const *const
+GameHandler::returnCamera () const
+{
+  return &this->mainCamera;
+}
+
+void
+GameHandler::update (GLfloat deltaTime)
+{
 }
 
 void
@@ -109,3 +120,20 @@ GameHandler::scrollCallback (GLFWwindow *window, double xoffset,
 {
   mainCamera.ProcessMouseScroll (static_cast<float> (yoffset));
 };
+
+GLfloat
+GameHandler::calculateDeltaTime ()
+{
+  static GLfloat deltaTime = 0;
+  static GLfloat lastFrame = 0;
+
+  GLfloat currentFrame = static_cast<float> (glfwGetTime ());
+  deltaTime = currentFrame - lastFrame;
+
+  if (deltaTime >= 1.0f / 30.0f)
+    {
+      lastFrame = currentFrame;
+    }
+
+  return deltaTime;
+}

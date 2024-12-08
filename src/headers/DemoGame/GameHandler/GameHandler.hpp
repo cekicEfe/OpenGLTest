@@ -5,6 +5,9 @@
 #include "DemoGame/GameCamera/GameCamera.hpp"
 #include "DemoGame/GameEntity/GameEntity.hpp"
 #include "DemoGame/GameEntity/HitBox/HitBox.h"
+#include "DemoGame/GameLight/GameLight.hpp"
+#include "DemoGame/GameModel/GameModel.hpp"
+#include "DemoGame/GameShader/GameShader.hpp"
 #include "model/Camera.h"
 #include "model/Model.h"
 #include "model/Shaders.h"
@@ -20,9 +23,9 @@ private:
 
   static GameCamera mainCamera;
 
-  std::vector<Shader> shaders;
-  std::vector<Model::Light> lights;
-  std::vector<Model::Model> models;
+  std::vector<testgame::GameLight> lights;
+  std::vector<testgame::GameModel> models;
+  std::vector<testgame::GameShader> shaders;
 
   std::vector<HitBox> hitboxes;
   std::vector<testgame::GameEntity> entities;
@@ -34,8 +37,12 @@ public:
   const testgame::GameEntity *const returnEntities () const;
   const size_t returnEntitiesSize () const;
 
-  const std::vector<Model::Light> &returnLights () const;
-  Camera const &returnCamera () const;
+  const Model::Light *const returnLights () const;
+  const size_t returnLightsSize () const;
+
+  Camera const *const returnCamera () const;
+
+  static void update (GLfloat deltaTime);
 
   static void mouse_callback (GLFWwindow *window, double xposIn,
                               double yposIn);
@@ -47,6 +54,7 @@ public:
 
   static void scrollCallback (GLFWwindow *window, double xoffset,
                               double yoffset);
+  GLfloat calculateDeltaTime ();
 };
 }
 

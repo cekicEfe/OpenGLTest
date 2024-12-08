@@ -10,11 +10,13 @@ namespace testgame
 {
 class HitBox
 {
-private:
+protected:
   std::vector<glm::vec3> vertices;
+  std::string hitboxName;
 
 public:
   HitBox ();
+  HitBox (std::string hitboxName);
   virtual ~HitBox ();
 };
 } // namespace core
