@@ -32,6 +32,7 @@ target_link_libraries(MAIN_EXEC
 
 target_include_directories(MAIN_EXEC PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src
                                          ${CMAKE_CURRENT_LIST_DIR}/src/header
+                                         ${CMAKE_CURRENT_LIST_DIR}/src/header/Model
                                          ${CMAKE_CURRENT_LIST_DIR}/include
                                          ${CMAKE_CURRENT_LIST_DIR}/include/glad
                                          ${CMAKE_CURRENT_LIST_DIR}/include/stb_image

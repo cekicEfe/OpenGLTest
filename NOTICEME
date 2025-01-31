@@ -1,0 +1,2 @@
+create the project with to see demo : cmake -DCMAKE_CXX_FLAGS="-DINCLUDE_DEMO"
+create the project with unit test to see well... unit tests : cmake -DCMAKE_CXX_FLAGS="-DUNIT_TESTS"

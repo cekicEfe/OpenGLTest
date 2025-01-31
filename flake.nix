@@ -13,20 +13,24 @@
         devShell = pkgs.mkShell {
           # Dependencies for OpenGL
           buildInputs = [
+            pkgs.valgrind
             pkgs.glm
             pkgs.freetype
             pkgs.libpng
             pkgs.assimp
-            pkgs.glfw-wayland # GLFW for window and context management
+            pkgs.glfw # GLFW for window and context management
             pkgs.imgui # ImGui for UI development
             pkgs.pkg-config # To manage compilation flags
             pkgs.libxkbcommon
             pkgs.libGL
             pkgs.xorg.libX11
+            pkgs.mesa
+            pkgs.glsl_analyzer
           ];
           #links libraries to shell
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-            pkgs.glfw-wayland
+            pkgs.glfw
+            pkgs.glsl_analyzer
             pkgs.xorg.libX11
             pkgs.glm
             pkgs.assimp
@@ -36,10 +40,10 @@
             pkgs.libxkbcommon
             pkgs.libGL
             pkgs.imgui
+            pkgs.mesa
           ];
           shellHook = ''
             	echo "OpenGL development environment is ready!"
-            	echo ${pkgs.imgui}
                     PS1="[\\u@\\h && OPENGL-DEV-ENV:\\w]\$ "
             	'';
         };
