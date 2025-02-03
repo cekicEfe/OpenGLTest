@@ -1,22 +1,15 @@
 #include "GameCamera.hpp"
 #include <stdexcept>
 
-testgame::GameCamera::GameCamera (glm::vec3 position, glm::vec3 up, float yaw,
-                                  float pitch, bool stopCamera)
-    : Camera (position, up, yaw, pitch), MovementSpeed (SPEED),
-      MouseSensitivity (SENSITIVITY)
-{
-  this->stopCamera = stopCamera;
-}
+testgame::GameCamera::GameCamera(glm::vec3 position, glm::vec3 up, float yaw,
+                                 float pitch, bool stopCamera)
+    : Camera(position, up, yaw, pitch), MovementSpeed(SPEED),
+      MouseSensitivity(SENSITIVITY) {}
 
-testgame::GameCamera::~GameCamera ()
-{
-}
+testgame::GameCamera::~GameCamera() {}
 
-void
-testgame::GameCamera::ProcessKeyboard (testgame::Camera_Movement direction,
-                                       GLfloat deltaTime)
-{
+void testgame::GameCamera::ProcessKeyboard(testgame::Camera_Movement direction,
+                                           GLfloat deltaTime) {
   float velocity = MovementSpeed * deltaTime;
   if (direction == FORWARD)
     Position += Front * velocity;
@@ -33,10 +26,8 @@ testgame::GameCamera::ProcessKeyboard (testgame::Camera_Movement direction,
     Position += WorldUp * velocity;
 }
 
-void
-testgame::GameCamera::ProcessMouseMovement (float xoffset, float yoffset,
-                                            GLboolean constrainPitch)
-{
+void testgame::GameCamera::ProcessMouseMovement(float xoffset, float yoffset,
+                                                GLboolean constrainPitch) {
   xoffset *= MouseSensitivity;
   yoffset *= MouseSensitivity;
 
@@ -44,21 +35,18 @@ testgame::GameCamera::ProcessMouseMovement (float xoffset, float yoffset,
   Pitch += yoffset;
 
   // make sure that when pitch is out of bounds, screen doesn't get flipped
-  if (constrainPitch)
-    {
-      if (Pitch > 89.0f)
-        Pitch = 89.0f;
-      if (Pitch < -89.0f)
-        Pitch = -89.0f;
-    }
+  if (constrainPitch) {
+    if (Pitch > 89.0f)
+      Pitch = 89.0f;
+    if (Pitch < -89.0f)
+      Pitch = -89.0f;
+  }
 
   // update Front, Right and Up Vectors using the updated Euler angles
-  updateCameraVectors ();
+  updateCameraVectors();
 }
 
-void
-testgame::GameCamera::ProcessMouseScroll (float yoffset)
-{
+void testgame::GameCamera::ProcessMouseScroll(float yoffset) {
   Zoom -= (float)yoffset;
   if (Zoom < MIN_ZOOM)
     Zoom = MIN_ZOOM;
@@ -66,26 +54,8 @@ testgame::GameCamera::ProcessMouseScroll (float yoffset)
     Zoom = MAX_ZOOM;
 }
 
-void
-testgame::GameCamera::setStatus (bool status)
-{
-  this->stopCamera = status;
-}
-
-bool
-testgame::GameCamera::getStatus () const
-{
-  return this->stopCamera;
-}
-
-void
-testgame::GameCamera::setSpeed (GLfloat speed)
-{
+void testgame::GameCamera::setSpeed(GLfloat speed) {
   this->MovementSpeed = speed;
 }
 
-GLfloat
-testgame::GameCamera::getSpeed () const
-{
-  return this->MovementSpeed;
-}
+GLfloat testgame::GameCamera::getSpeed() const { return this->MovementSpeed; }

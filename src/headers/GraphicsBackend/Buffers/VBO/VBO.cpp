@@ -4,11 +4,13 @@ using namespace Model;
 
 VBO::VBO() { glGenBuffers(1, &this->id); };
 
-VBO::~VBO() { this->Delete(); }
+VBO::~VBO() {
+  // this->Delete();
+}
 
-void VBO::Bind() { glBindBuffer(GL_ARRAY_BUFFER, this->id); }
+void VBO::Bind() const { glBindBuffer(GL_ARRAY_BUFFER, this->id); }
 
-void VBO::Unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+void VBO::Unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
 void VBO::Delete() { glDeleteBuffers(1, &this->id); }
 
@@ -22,12 +24,11 @@ void VBO::BufferData(std::vector<glm::mat4> *Instances) {
                &Instances->at(0), GL_STATIC_DRAW);
 }
 
-void VBO::PointData(VERTEX_OFFSET offSetName) {
+void VBO::PointData(VERTEX_INCLUDES offSetName) {
   switch (offSetName) {
   case POSITION:
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, position));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
     break;
   case NORMAL:
     glEnableVertexAttribArray(1);
@@ -41,15 +42,8 @@ void VBO::PointData(VERTEX_OFFSET offSetName) {
     break;
   case COLOR:
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, color));
     break;
   }
-}
-
-void VBO::PointData(size_t layoutIndex, size_t dataSize, size_t stride,
-                    const void *address) {
-  glEnableVertexAttribArray(layoutIndex);
-  glVertexAttribPointer(layoutIndex, dataSize, GL_FLOAT, GL_FALSE, stride,
-                        address);
 }

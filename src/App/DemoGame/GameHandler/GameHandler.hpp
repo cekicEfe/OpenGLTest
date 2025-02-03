@@ -7,43 +7,40 @@
 #include "App/DemoGame/GameLight/GameLight.hpp"
 #include "App/DemoGame/GameModel/GameModel.hpp"
 #include "App/DemoGame/GameShader/GameShader.hpp"
+#include "CoreBackend/GlfwHandler/WindowHandler/Window/Window.h"
+#include "imgui.h"
+#include "imguiFileExplorer/imfilebrowser.h"
 #include <vector>
 
 namespace testgame {
 class GameHandler {
 private:
+  std::vector<std::unique_ptr<HitBox>> hitboxes;
+  std::vector<std::unique_ptr<testgame::GameLight>> lights;
+  std::vector<std::unique_ptr<testgame::GameModel>> models;
+  std::vector<std::unique_ptr<testgame::GameShader>> shaders;
+  std::vector<std::unique_ptr<testgame::GameEntity>> entities;
+
   static GameCamera mainCamera;
-
-  std::vector<testgame::GameLight> lights;
-  std::vector<testgame::GameModel> models;
-  std::vector<testgame::GameShader> shaders;
-
-  std::vector<HitBox> hitboxes;
-  std::vector<testgame::GameEntity> entities;
+  static bool menuIsUp;
 
 public:
   GameHandler();
   ~GameHandler();
 
   void initDemo();
+  void demoMainLoop(const core::Window &window);
+  void demoCleanup();
 
-  const testgame::GameEntity *const returnEntities() const;
-  const size_t returnEntitiesSize() const;
-
-  const Model::Light *const returnLights() const;
-  const size_t returnLightsSize() const;
-
-  const GameCamera *const returnCamera() const;
+  GLfloat calculateDeltaTime();
+  void update(GLfloat deltaTime);
+  void processInput(GLFWwindow *window, GLfloat deltaTime);
 
   static void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
   static void defaultFramebufferSizeCallback(GLFWwindow *window, int width,
                                              int height);
-  void processInput(GLFWwindow *window, GLfloat deltaTime);
   static void scrollCallback(GLFWwindow *window, double xoffset,
                              double yoffset);
-
-  GLfloat calculateDeltaTime();
-  void update(GLfloat deltaTime);
 };
 } // namespace testgame
 

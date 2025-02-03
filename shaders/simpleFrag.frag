@@ -1,13 +1,5 @@
 #version 330 core
 
-// struct Light
-// {
-// 	vec3 light_color;
-// 	vec3 light_pos;
-// 	float ambient;
-// 	float diffuse;
-// };
-
 out vec4 FragColor;
 
 in vec2 TexCoords;
@@ -19,8 +11,8 @@ uniform int light_count;
 uniform vec3 light_positions[100];
 uniform vec3 light_colors[100];
 
-uniform float ambient;
-uniform float diffuse;
+// uniform float ambient;
+// uniform float diffuse;
 uniform sampler2D texture_diffuse1;
 
 void main()

@@ -10,35 +10,39 @@
 #include <CoreBackend/GlfwHandler/ImGuiHandler/ImGuiHandler.hpp>
 #include <iostream>
 
-namespace core {
+namespace core
+{
 
-class GlfwHandler {
+class GlfwHandler
+{
 private:
   core::WindowHandler windowHandler;
   core::ImGuiHandler imguiHandler;
 
-  void initImGui();
-  void initLoopImGui();
-  void renderImGui();
-  void terminateImGui();
+  void initImGui ();
+  void initLoopImGui ();
+  void renderImGui ();
+  void terminateImGui ();
 
-  void setLoopVariables();
-  void swapBuffers();
-  void pollEvents();
+  void setLoopVariables ();
+  void swapBuffers ();
+  void pollEvents ();
 
 public:
-  GlfwHandler();
-  ~GlfwHandler();
+  GlfwHandler ();
+  ~GlfwHandler ();
 
   core::InputHandler inputHandler;
 
-  void initGlfwHandler(std::string windowName, GLuint SCR_WIDTH,
-                       GLuint SCR_HEIGHT);
-  GLuint checkWindowShouldClose();
-  void beginLoop();
-  GLFWwindow *returnMainWindow();
-  void endLoop();
-  void cleanupGlfwHandler();
+  void initGlfwHandler (std::string windowName, GLuint SCR_WIDTH,
+                        GLuint SCR_HEIGHT);
+  GLuint checkWindowShouldClose ();
+  void beginLoop ();
+
+  const core::Window &returnMainWindow ();
+
+  void endLoop ();
+  void cleanupGlfwHandler ();
 };
 
 } // namespace core

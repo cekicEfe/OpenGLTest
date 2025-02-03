@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/trigonometric.hpp"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -39,8 +41,19 @@ public:
 
   // returns the view matrix calculated using Euler Angles and the LookAt
   // Matrix
+  glm::vec3 GetPos() const { return this->Position; }
+
+  void SetPos(glm::vec3 pos) { this->Position = pos; }
+
+  glm::vec3 GetFront() const { return this->Front; }
+
   glm::mat4 GetViewMatrix() const {
     return glm::lookAt(Position, Position + Front, Up);
+  }
+
+  glm::mat4 GetProjection(GLfloat aspect) const {
+    return glm::perspective(glm::radians(this->Zoom), aspect, CloseSight,
+                            FarSight);
   }
 
   const float &getCloseSight() const { return this->CloseSight; }

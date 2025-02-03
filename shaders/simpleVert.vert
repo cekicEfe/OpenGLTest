@@ -30,9 +30,6 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec3 aColour;
 layout (location = 4) in mat4 aInstanceMatrix;// Consumes to layout 7
-// layout (location = 5) in mat4 aInstanceMatrix;// Consumes to layout 7
-// layout (location = 6) in mat4 aInstanceMatrix;// Consumes to layout 7
-// layout (location = 7) in mat4 aInstanceMatrix;// Consumes to layout 7
 
 out vec3 Colour;
 out vec2 TexCoords;

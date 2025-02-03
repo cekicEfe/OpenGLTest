@@ -1,7 +1,9 @@
 #include "EBO.h"
 EBO::EBO() { glGenBuffers(1, &this->id); }
 
-EBO::~EBO() { this->Delete(); }
+EBO::~EBO() {
+  // this->Delete();
+}
 
 void EBO::Bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id); }
 

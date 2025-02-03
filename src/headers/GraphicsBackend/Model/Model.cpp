@@ -16,11 +16,11 @@ GLboolean Model::Model::HasTexture() const {
 
 Model::Model::~Model() {}
 
-// void Model::Model::Draw(Shader &shader) {
-//   for (GLuint i = 0; i < this->Meshes.size(); i++) {
-//     this->Meshes[i].Draw(shader);
-//   }
-// }
+void Model::Model::Draw(const Shader &shader) const {
+  for (GLuint i = 0; i < this->Meshes.size(); i++) {
+    this->Meshes[i].Draw(shader);
+  }
+}
 
 void Model::Model::loadModel(std::string path) {
   // read file via ASSIMP
@@ -35,11 +35,8 @@ void Model::Model::loadModel(std::string path) {
     std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
     return;
   }
-  // return path
-  this->path = path;
   // retrieve the directory path of the filepath
   this->directory = path.substr(0, path.find_last_of('/'));
-
   // process ASSIMP's root node recursively
   processNode(scene->mRootNode, scene);
 }
@@ -87,7 +84,7 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
       vector.x = mesh->mColors[i]->r;
       vector.y = mesh->mColors[i]->g;
       vector.z = mesh->mColors[i]->b;
-      vertex.color = glm::vec3(vector);
+      vertex.color = glm::vec4(vector, mesh->mColors[i]->a);
     }
     // texture coordinates
     if (mesh->mTextureCoords[0]) // does the mesh contain texture
@@ -102,13 +99,13 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
       vec.y = mesh->mTextureCoords[0][i].y;
       vertex.texture = vec;
 
-      // tangent
+      //          tangent
       // vector.x = mesh->mTangents[i].x;
       // vector.y = mesh->mTangents[i].y;
       // vector.z = mesh->mTangents[i].z;
       // vertex.tangent = vector;
 
-      // // bitangent
+      // bitangent
       // vector.x = mesh->mBitangents[i].x;
       // vector.y = mesh->mBitangents[i].y;
       // vector.z = mesh->mBitangents[i].z;

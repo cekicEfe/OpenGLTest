@@ -7,11 +7,17 @@
 //
 #include <iostream>
 
-namespace core {
+namespace core
+{
 
-enum WindowType { FULL_SCREEN, WINDOWED };
+enum WindowType
+{
+  FULL_SCREEN,
+  WINDOWED
+};
 
-class Window {
+class Window
+{
 private:
   std::string windowName;
   WindowType type;
@@ -21,17 +27,23 @@ private:
   GLFWwindow *window = nullptr;
   GLuint windowIsSet = 0;
 
-  void createWindow();
-  void destroyWindow();
+  void createWindow ();
+  void destroyWindow ();
 
 public:
-  Window(std::string windowName, WindowType type, GLuint SCR_WIDTH,
-         GLuint SCR_HEIGHT);
-  ~Window();
+  Window (std::string windowName, WindowType type, GLuint SCR_WIDTH,
+          GLuint SCR_HEIGHT);
+  ~Window ();
 
-  const GLuint &getScrWidth() const;
-  const GLuint &getScrHeight() const;
-  GLFWwindow *returnGLFWWindow();
+  GLfloat
+  GetAspectRatio () const
+  {
+    return (GLfloat)(SCR_WIDTH) / (GLfloat)(SCR_HEIGHT);
+  };
+
+  const GLuint &getScrWidth () const;
+  const GLuint &getScrHeight () const;
+  GLFWwindow *returnGLFWWindow () const;
 };
 
 } // namespace core

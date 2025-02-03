@@ -6,26 +6,25 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-class VBO {
+class VBO
+{
 private:
   GLuint id;
 
 public:
-  VBO();
-  ~VBO();
+  VBO ();
+  ~VBO ();
 
-  void Bind();
-  void Unbind();
-  void Delete();
-  void PointData(VERTEX_OFFSET offSetName);
+  void Bind () const;
+  void Unbind () const;
+  void Delete ();
 
-  void PointData(size_t layoutIndex, size_t dataSize, size_t stride,
-                 const void *address);
-  template <typename A, typename B, typename C, typename D>
-  void PointData(A, B, C, const D) = delete;
+  void PointData (VERTEX_INCLUDES offSetName);
+  // void PointData (size_t layoutIndex, size_t dataSize, size_t stride,
+  //                 void *address);
 
-  void BufferData(std::vector<glm::mat4> *Instances);
-  void BufferData(std::vector<Model::Vertex> &vertices);
+  void BufferData (std::vector<glm::mat4> *Instances);
+  void BufferData (std::vector<Model::Vertex> &vertices);
 };
 
 #endif // !VBO_H

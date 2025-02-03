@@ -3,11 +3,11 @@
 
 #include <glm/glm.hpp>
 
-enum VERTEX_OFFSET {
+enum VERTEX_INCLUDES {
   POSITION,
   NORMAL,
   TEXTURE,
-  COLOR,
+  COLOR
   // TANGENT,
   // B_TANGENT,
   // BONE,
@@ -18,7 +18,7 @@ namespace Model {
 
 struct Vertex {
   glm::vec3 position;
-  glm::vec3 color;
+  glm::vec4 color;
   glm::vec3 normal;
   glm::vec2 texture;
   // glm::vec3 tangent;

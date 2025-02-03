@@ -9,21 +9,23 @@
 #include <GraphicsBackend/Vertex/Vertex.h>
 #include <vector>
 
-namespace Model {
-class Mesh {
+namespace Model
+{
+class Mesh
+{
 public:
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
 
-  Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
-       std::vector<Texture> textures);
-  // void Draw(Shader &shader);
+  Mesh (std::vector<Vertex> vertices, std::vector<GLuint> indices,
+        std::vector<Texture> textures);
+  void Draw (const Shader &shader) const;
 
   VBO vbo;
   EBO ebo;
   VAO vao;
-  void setupMesh();
+  void setupMesh ();
 };
 } // namespace Model
 

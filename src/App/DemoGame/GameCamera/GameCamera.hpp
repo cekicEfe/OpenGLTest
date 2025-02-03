@@ -17,7 +17,7 @@ enum Camera_Movement {
 // Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 2.5f;
+const float SPEED = 1.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 15.0f;
 const float FAR_SIGHT = 1000.0f;
@@ -27,8 +27,6 @@ const float MIN_ZOOM = 1.0f;  // 1.0f
 
 class GameCamera : public Camera {
 private:
-  bool stopCamera;
-
   float MovementSpeed;
   float MouseSensitivity;
 
@@ -43,8 +41,6 @@ public:
                             GLboolean constrainPitch = true);
   void ProcessMouseScroll(float yoffset);
 
-  void setStatus(bool status);
-  bool getStatus() const;
   void setSpeed(GLfloat speed);
   GLfloat getSpeed() const;
 };

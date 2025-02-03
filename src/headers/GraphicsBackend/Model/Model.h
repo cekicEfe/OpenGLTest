@@ -24,29 +24,38 @@
 #include <string>
 #include <vector>
 
-namespace Model {
+namespace Model
+{
 
-class Model {
+class Model
+{
 public:
-  Model(std::string const &path, GLboolean gamma = false);
-  GLboolean HasTexture() const;
-  // void Draw(Shader &shader);
-  ~Model();
+  Model (std::string const &path, GLboolean gamma = false);
+  GLboolean HasTexture () const;
 
-  // private:
+  void Draw (const Shader &shader) const;
+
+  ~Model ();
+
   std::vector<Mesh> Meshes;
   std::vector<Texture> Textures;
   std::string directory;
   std::string path;
   GLboolean gammaCorrection;
 
-  void loadModel(std::string path);
-  void processNode(aiNode *node, const aiScene *scene);
-  Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-  std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
-                                            std::string typeName);
-  GLuint TextureFromFile(const char *path, const std::string &directory,
-                         bool gamma);
+  bool containsTextures;
+  bool containsMaterials;
+  bool containsColours;
+
+private:
+  void loadModel (std::string path);
+  void processNode (aiNode *node, const aiScene *scene);
+  Mesh processMesh (aiMesh *mesh, const aiScene *scene);
+  std::vector<Texture> loadMaterialTextures (aiMaterial *mat,
+                                             aiTextureType type,
+                                             std::string typeName);
+  GLuint TextureFromFile (const char *path, const std::string &directory,
+                          bool gamma);
 };
 
 } // namespace Model

@@ -5,16 +5,19 @@
 //
 #include <GLFW/glfw3.h>
 
-class VAO {
+class VAO
+{
 private:
   GLuint id;
 
 public:
-  VAO();
-  ~VAO();
-  void Bind();
-  void Unbind();
-  void Delete();
+  VAO ();
+  ~VAO ();
+  void Bind () const;
+  void Unbind () const;
+  void Delete ();
+
+  GLuint GetID () const;
 };
 
 #endif // !VAO_H

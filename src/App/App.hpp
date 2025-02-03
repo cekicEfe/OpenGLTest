@@ -9,8 +9,8 @@ namespace App {
 class App {
 private:
   testgame::GameHandler gameHandler;
+  // core::RenderHandler renderHandler;
   core::GlfwHandler glfwHandler;
-  core::RenderHandler renderHandler;
 
 public:
   App();
