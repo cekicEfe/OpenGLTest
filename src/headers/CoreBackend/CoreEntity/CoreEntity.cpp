@@ -58,8 +58,7 @@ void core::CoreEntity::setRotRad(const GLfloat &rotRad) {
 }
 
 const glm::mat4 core::CoreEntity::getUniformAlignment() const {
-  glm::mat4 modelMatrix;
-  modelMatrix = glm::mat4(1.0);
+  glm::mat4 modelMatrix = glm::mat4(1.0);
   modelMatrix = glm::translate(modelMatrix, this->mPos);
   modelMatrix = glm::scale(modelMatrix, this->mModelScale);
   modelMatrix = glm::rotate(modelMatrix, this->mRotDegreeRad, this->mRotAxis);

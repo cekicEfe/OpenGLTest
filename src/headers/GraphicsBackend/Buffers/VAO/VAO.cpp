@@ -5,10 +5,9 @@ VAO::VAO() { glGenVertexArrays(1, &this->id); }
 VAO::~VAO() {
   // Fuck, this line cost me 5 days to fucking find NO render call "works"
   // all meshes created through copy constructors
-  // every time I create a mesh all previus VAO gets deleted
-  // thus no vertexes gets pointed
-  // I dont even understand half of it
-  // fuck that
+  // every time I create and call a copy constructor a mesh all previus VAO ID's
+  // gets deleted thus no vertexes created by other VBO's gets pointed I dont
+  // even understand half of it fuck that
 
   // Note to self:
   // DO NOT BLINDLY ADD BOILER PLATES

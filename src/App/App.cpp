@@ -27,7 +27,6 @@ void App::App::init() {
 }
 
 void App::App::mainLoop() {
-
   while (!this->glfwHandler.checkWindowShouldClose()) {
     static GLfloat deltaTime = this->gameHandler.calculateDeltaTime();
     this->gameHandler.processInput(
