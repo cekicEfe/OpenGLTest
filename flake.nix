@@ -14,33 +14,43 @@
           # Dependencies for OpenGL
           buildInputs = [
             pkgs.valgrind
-            pkgs.glm
+            pkgs.glsl_analyzer
+            pkgs.gdb
+
             pkgs.freetype
             pkgs.libpng
-            pkgs.assimp
-            pkgs.glfw # GLFW for window and context management
-            pkgs.imgui # ImGui for UI development
             pkgs.pkg-config # To manage compilation flags
             pkgs.libxkbcommon
             pkgs.libGL
             pkgs.xorg.libX11
             pkgs.mesa
-            pkgs.glsl_analyzer
+
+            pkgs.lua
+            pkgs.sol2
+            pkgs.bullet
+            pkgs.glm
+            pkgs.assimp
+            pkgs.glfw # GLFW for window and context management
+            pkgs.imgui # ImGui for UI development
           ];
           #links libraries to shell
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-            pkgs.glfw
             pkgs.glsl_analyzer
             pkgs.xorg.libX11
-            pkgs.glm
-            pkgs.assimp
             pkgs.freetype
             pkgs.libpng
             pkgs.wayland
             pkgs.libxkbcommon
             pkgs.libGL
-            pkgs.imgui
             pkgs.mesa
+
+            pkgs.lua
+            pkgs.sol2
+            pkgs.bullet
+            pkgs.glm
+            pkgs.assimp
+            pkgs.glfw
+            pkgs.imgui
           ];
           shellHook = ''
             	echo "OpenGL development environment is ready!"

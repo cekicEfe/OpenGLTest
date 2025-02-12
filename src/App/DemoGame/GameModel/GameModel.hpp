@@ -11,7 +11,7 @@ private:
 
 public:
   GameModel(const std::string &path, const std::string &modelName,
-            GLboolean gammcorrection = false);
+            GLboolean gammcorrection = false, bool flip_textures = true);
   ~GameModel();
   const std::string &getModelName() const;
 };

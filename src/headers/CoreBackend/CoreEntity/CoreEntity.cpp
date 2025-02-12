@@ -2,25 +2,26 @@
 
 core::CoreEntity::CoreEntity() {}
 
-core::CoreEntity::CoreEntity(Model::Model &model, glm::vec3 modelScale,
-                             Shader &shader, glm::vec3 rtcomp, GLfloat rotrad,
-                             glm::vec3 mvcomp) {
-  this->mpModel = &model;
+core::CoreEntity::CoreEntity(const std::shared_ptr<Model::Model> &model,
+                             const std::shared_ptr<Shader> &shader,
+                             glm::vec3 modelScale, glm::vec3 pos, glm::vec3 rot,
+                             GLfloat rotrad) {
+  this->mpModel = model;
   this->mModelScale = modelScale;
-  this->mpShader = &shader;
-  this->mPos = mvcomp;
-  this->mRotAxis = rtcomp;
+  this->mpShader = shader;
+  this->mPos = pos;
+  this->mRotAxis = rot;
   this->mRotDegreeRad = rotrad;
 }
 
 core::CoreEntity::~CoreEntity() {}
 
-const Shader *const core::CoreEntity::getShader() const {
-  return this->mpShader;
+const Model::Model *const core::CoreEntity::getModel() const {
+  return this->mpModel.lock().get();
 }
 
-const Model::Model *const core::CoreEntity::getModel() const {
-  return this->mpModel;
+const Shader *const core::CoreEntity::getShader() const {
+  return this->mpShader.lock().get();
 }
 
 const glm::vec3 &core::CoreEntity::getModelScale() const {
@@ -35,11 +36,11 @@ const GLfloat &core::CoreEntity::getRotRad() const {
   return this->mRotDegreeRad;
 }
 
-void core::CoreEntity::setShader(Shader *const shader) {
+void core::CoreEntity::setShader(const std::shared_ptr<Shader> &shader) {
   this->mpShader = shader;
 }
 
-void core::CoreEntity::setModel(Model::Model *const modelptr) {
+void core::CoreEntity::setModel(const std::shared_ptr<Model::Model> modelptr) {
   this->mpModel = modelptr;
 }
 

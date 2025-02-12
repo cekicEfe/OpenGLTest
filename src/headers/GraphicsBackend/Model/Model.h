@@ -24,38 +24,35 @@
 #include <string>
 #include <vector>
 
-namespace Model
-{
+namespace Model {
 
-class Model
-{
+class Model {
 public:
-  Model (std::string const &path, GLboolean gamma = false);
-  GLboolean HasTexture () const;
+  Model(std::string const &path, bool gamma = false, bool flip_textures = true);
+  bool HasTexture() const;
 
-  void Draw (const Shader &shader) const;
+  void Draw(const Shader &shader) const;
 
-  ~Model ();
+  ~Model();
 
+private:
   std::vector<Mesh> Meshes;
   std::vector<Texture> Textures;
   std::string directory;
   std::string path;
-  GLboolean gammaCorrection;
+  bool gammaCorrection;
 
-  bool containsTextures;
-  bool containsMaterials;
-  bool containsColours;
+  // bool containsTextures;
+  // bool containsMaterials;
+  // bool containsColours;
 
-private:
-  void loadModel (std::string path);
-  void processNode (aiNode *node, const aiScene *scene);
-  Mesh processMesh (aiMesh *mesh, const aiScene *scene);
-  std::vector<Texture> loadMaterialTextures (aiMaterial *mat,
-                                             aiTextureType type,
-                                             std::string typeName);
-  GLuint TextureFromFile (const char *path, const std::string &directory,
-                          bool gamma);
+  void loadModel(std::string path);
+  void processNode(aiNode *node, const aiScene *scene);
+  Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+  std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
+                                            std::string typeName);
+  GLuint TextureFromFile(const char *path, const std::string &directory,
+                         bool gamma);
 };
 
 } // namespace Model

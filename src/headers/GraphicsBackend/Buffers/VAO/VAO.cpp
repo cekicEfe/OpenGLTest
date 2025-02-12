@@ -1,6 +1,10 @@
 #include "VAO.h"
+#include <CoreBackend/ErrorHandler/ErrorHandler.hpp>
 
-VAO::VAO() { glGenVertexArrays(1, &this->id); }
+VAO::VAO() {
+  glGenVertexArrays(1, &this->id);
+  core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
+}
 
 VAO::~VAO() {
   // Fuck, this line cost me 5 days to fucking find NO render call "works"
@@ -12,13 +16,22 @@ VAO::~VAO() {
   // Note to self:
   // DO NOT BLINDLY ADD BOILER PLATES
   // DUMB MOTHERFUCKER
-  // this->Delete ();
+  // this->Delete();
 }
 
-void VAO::Bind() const { glBindVertexArray(this->id); }
+void VAO::Bind() const {
+  glBindVertexArray(this->id);
+  core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
+}
 
-void VAO::Unbind() const { glBindVertexArray(0); }
+void VAO::Unbind() const {
+  glBindVertexArray(0);
+  core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
+}
 
-void VAO::Delete() { glDeleteVertexArrays(1, &this->id); }
+void VAO::Delete() {
+  glDeleteVertexArrays(1, &this->id);
+  core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
+}
 
 GLuint VAO::GetID() const { return this->id; }

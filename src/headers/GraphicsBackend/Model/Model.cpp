@@ -1,12 +1,15 @@
 #include <GraphicsBackend/Model/Model.h>
+#include <filesystem>
 #include <stb_image/stb_image.h>
 
-Model::Model::Model(std::string const &path, GLboolean gamma)
+Model::Model::Model(std::string const &path, bool gamma, bool flip_textures)
     : gammaCorrection(gamma) {
+  std::cout << "Model with path : " << path << " created" << std::endl;
+  stbi_set_flip_vertically_on_load(flip_textures);
   loadModel(path);
 }
 
-GLboolean Model::Model::HasTexture() const {
+bool Model::Model::HasTexture() const {
   if (this->Textures.size() == 0) {
     return false;
   } else {
@@ -55,7 +58,6 @@ void Model::Model::processNode(aiNode *node, const aiScene *scene) {
 
 Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   // data to fill
-  stbi_set_flip_vertically_on_load(true);
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
@@ -100,21 +102,22 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
       vertex.texture = vec;
 
       //          tangent
-      // vector.x = mesh->mTangents[i].x;
-      // vector.y = mesh->mTangents[i].y;
-      // vector.z = mesh->mTangents[i].z;
-      // vertex.tangent = vector;
+      vector.x = mesh->mTangents[i].x;
+      vector.y = mesh->mTangents[i].y;
+      vector.z = mesh->mTangents[i].z;
+      vertex.tangent = vector;
 
       // bitangent
-      // vector.x = mesh->mBitangents[i].x;
-      // vector.y = mesh->mBitangents[i].y;
-      // vector.z = mesh->mBitangents[i].z;
-      // vertex.biTangent = vector;
+      vector.x = mesh->mBitangents[i].x;
+      vector.y = mesh->mBitangents[i].y;
+      vector.z = mesh->mBitangents[i].z;
+      vertex.biTangent = vector;
     } else
       vertex.texture = glm::vec2(0.0f, 0.0f);
 
     vertices.push_back(vertex);
   }
+
   // now wak through each of the mesh's faces (a face is a mesh its triangle)
   // and retrieve the corresponding vertex indices.
   for (GLuint i = 0; i < mesh->mNumFaces; i++) {
@@ -123,6 +126,7 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     for (GLuint j = 0; j < face.mNumIndices; j++)
       indices.push_back(face.mIndices[j]);
   }
+
   // process materials
   aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
   // we assume a convention for sampler names in the shaders. Each diffuse
@@ -159,11 +163,23 @@ Model::Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
   for (GLuint i = 0; i < mat->GetTextureCount(type); i++) {
     aiString str;
     mat->GetTexture(type, i, &str);
+    std::string model_str = str.data;
+
+    model_str = model_str.substr(model_str.find_last_of("/\\") + 1);
+
+    std::filesystem::path model_str_path =
+        std::filesystem::path(this->directory) /
+        std::filesystem::path(model_str);
+
+    // std::cout << model_str << std::endl;
+    // std::cout << model_str_path << std::endl;
+
     // check if texture was loaded before and if so, continue to next
     // iteration: skip loading a new texture
     bool skip = false;
     for (GLuint j = 0; j < this->Textures.size(); j++) {
-      if (std::strcmp(this->Textures[j].path.data(), str.C_Str()) == 0) {
+      if (std::strcmp(this->Textures[j].path.c_str(), model_str_path.c_str()) ==
+          0) {
         new_textures_loaded.push_back(this->Textures[j]);
         skip = true; // a texture with the same filepath has already been
                      // loaded, continue to next one. (optimization)
@@ -172,10 +188,10 @@ Model::Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
     }
     if (!skip) { // if texture hasn't been loaded already, load it
       Texture texture;
-      texture.ID =
-          TextureFromFile(str.C_Str(), this->directory, this->gammaCorrection);
+      texture.ID = TextureFromFile(model_str_path.c_str(), this->directory,
+                                   this->gammaCorrection);
       texture.type = typeName;
-      texture.path = str.C_Str();
+      texture.path = model_str_path.c_str();
       new_textures_loaded.push_back(texture);
       this->Textures.push_back(
           texture); // store it as texture loaded for entire model, to
@@ -189,8 +205,12 @@ Model::Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
 // they're not loaded yet. the required info is returned as a Texture struct.
 GLuint Model::Model::TextureFromFile(const char *path,
                                      const std::string &directory, bool gamma) {
-  std::string filename = std::string(path);
-  filename = directory + '/' + filename;
+  std::string filename = std::filesystem::path(path);
+  // std::cout << filename << std::endl;
+  // size_t index = filename.find_last_of("/\\");
+  // std::filesystem::path filename_path =
+  // directory / std::filesystem::path(filename.substr(index + 1));
+  // std::cout << filename_path << std::endl;
 
   GLuint textureID;
   glGenTextures(1, &textureID);
@@ -218,9 +238,11 @@ GLuint Model::Model::TextureFromFile(const char *path,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     stbi_image_free(data);
   } else {
-    std::cout << "Texture failed to load at path: " << path << std::endl;
+    std::cout << "Texture failed to load at path: " << filename << std::endl;
     stbi_image_free(data);
   }
   return textureID;

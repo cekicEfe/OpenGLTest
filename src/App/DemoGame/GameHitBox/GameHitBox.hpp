@@ -6,15 +6,15 @@
 #include <vector>
 
 namespace testgame {
-class HitBox {
+class GameHitBox {
 protected:
   std::vector<glm::vec3> vertices;
   std::string hitboxName;
 
 public:
-  HitBox();
-  HitBox(std::string hitboxName);
-  virtual ~HitBox();
+  GameHitBox();
+  GameHitBox(std::string hitboxName);
+  virtual ~GameHitBox();
 };
 } // namespace testgame
 
