@@ -1,4 +1,8 @@
+
 #include <GraphicsBackend/Model/Model.h>
+//
+#include "GraphicsBackend/Material/Material.hpp"
+#include <assimp/types.h>
 #include <filesystem>
 #include <stb_image/stb_image.h>
 
@@ -115,6 +119,14 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     } else
       vertex.texture = glm::vec2(0.0f, 0.0f);
 
+    if (mesh->HasBones()) {
+      for (int i = 0; i < mesh->mNumBones; i++) {
+        uint bone_index = 0;
+        std::string bone_name(mesh->mBones[i]->mName.data);
+        bone_index =
+      }
+    }
+
     vertices.push_back(vertex);
   }
 
@@ -188,10 +200,23 @@ Model::Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
     }
     if (!skip) { // if texture hasn't been loaded already, load it
       Texture texture;
+      aiColor3D color;
+      float shininess;
+
       texture.ID = TextureFromFile(model_str_path.c_str(), this->directory,
                                    this->gammaCorrection);
       texture.type = typeName;
       texture.path = model_str_path.c_str();
+
+      mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+      texture.material.diffuse = glm::vec3(color.r, color.b, color.g);
+      mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+      texture.material.ambient = glm::vec3(color.r, color.b, color.g);
+      mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+      texture.material.specular = glm::vec3(color.r, color.b, color.g);
+      mat->Get(AI_MATKEY_SHININESS, shininess);
+      texture.material.shininess = shininess;
+
       new_textures_loaded.push_back(texture);
       this->Textures.push_back(
           texture); // store it as texture loaded for entire model, to
@@ -212,7 +237,7 @@ GLuint Model::Model::TextureFromFile(const char *path,
   // directory / std::filesystem::path(filename.substr(index + 1));
   // std::cout << filename_path << std::endl;
 
-  GLuint textureID;
+  GLuint textureID = 0;
   glGenTextures(1, &textureID);
 
   int width, height, nrComponents;
