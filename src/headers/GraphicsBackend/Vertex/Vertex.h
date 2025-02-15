@@ -23,8 +23,8 @@ struct Vertex {
   glm::vec2 texture;
   glm::vec3 tangent;
   glm::vec3 biTangent;
-  int boneIds[4]; // 4 is the max bone influence
-  float weights[4];
+  int boneIds[4] = {0}; // 4 is the max bone influence
+  float weights[4] = {0.0f};
 };
 
 } // namespace Model
