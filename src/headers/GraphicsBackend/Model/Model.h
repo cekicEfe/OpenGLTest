@@ -42,10 +42,6 @@ private:
   std::string path;
   bool gammaCorrection;
 
-  // bool containsTextures;
-  // bool containsMaterials;
-  // bool containsColours;
-
   void loadModel(std::string path);
   void processNode(aiNode *node, const aiScene *scene);
   Mesh processMesh(aiMesh *mesh, const aiScene *scene);

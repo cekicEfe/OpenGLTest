@@ -65,6 +65,8 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
+  std::map<std::string, uint> boneMapping;
+  std::vector<glm::mat4> boneOffsets;
 
   // walk through each of the mesh's vertices
   for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -124,9 +126,36 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
   // process bones
   if (mesh->HasBones()) {
-    for (int i = 0; i < mesh->mNumBones; i++) {
-      uint bone_index = 0;
-      std::string bone_name(mesh->mBones[i]->mName.data);
+    for (unsigned int i = 0; i < mesh->mNumBones; i++) {
+      std::string boneName = mesh->mBones[i]->mName.C_Str();
+
+      int boneIndex;
+      if (boneMapping.find(boneName) == boneMapping.end()) {
+        boneIndex = boneMapping.size();
+        boneMapping[boneName] = boneIndex;
+        auto offsetMatrix = mesh->mBones[i]->mOffsetMatrix;
+        boneOffsets.push_back(glm::transpose(glm::mat4(
+            offsetMatrix.a1, offsetMatrix.a2, offsetMatrix.a3, offsetMatrix.a4,
+            offsetMatrix.b1, offsetMatrix.b2, offsetMatrix.b3, offsetMatrix.b4,
+            offsetMatrix.c1, offsetMatrix.c2, offsetMatrix.c3, offsetMatrix.c4,
+            offsetMatrix.d1, offsetMatrix.d2, offsetMatrix.d3,
+            offsetMatrix.d4))); // Convert Assimp matrix
+      } else {
+        boneIndex = boneMapping[boneName];
+      }
+
+      for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+        int vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
+        float weight = mesh->mBones[i]->mWeights[j].mWeight;
+
+        for (int k = 0; k < 4; k++) {
+          if (vertices[vertexID].weights[k] == 0.0f) {
+            vertices[vertexID].boneIds[k] = boneIndex;
+            vertices[vertexID].weights[k] = weight;
+            break;
+          }
+        }
+      }
     }
   }
 

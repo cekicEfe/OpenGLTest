@@ -17,7 +17,9 @@ public:
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
-  std::map<std::string, Bone> bonemap;
+
+  std::map<std::string, int> boneMapping; // Bone name to index
+  std::vector<glm::mat4> boneOffsets;     // Bone offset matrices
 
   Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
        std::vector<Texture> textures);

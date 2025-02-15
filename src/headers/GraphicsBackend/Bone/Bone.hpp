@@ -8,6 +8,7 @@ struct Bone {
   std::string name;
   std::string info;
   glm::mat4 offset;
+  uint id;
 };
 
 } // namespace Model
