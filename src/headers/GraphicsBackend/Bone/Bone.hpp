@@ -1,12 +1,15 @@
 #ifndef BONE_HPP
 #define BONE_HPP
 
+#include "glm/glm.hpp"
 #include <string>
-namespace core {
+namespace Model {
 struct Bone {
   std::string name;
+  std::string info;
+  glm::mat4 offset;
 };
 
-} // namespace core
+} // namespace Model
 
 #endif

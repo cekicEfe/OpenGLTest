@@ -84,8 +84,8 @@ void VBO::PointData(VERTEX_INCLUDES offSetName) {
   case BONE:
     glEnableVertexAttribArray(6);
     core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
-    glVertexAttribPointer(6, 4, GL_INT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, boneIds));
+    glVertexAttribIPointer(6, 4, GL_INT, sizeof(Vertex),
+                           (void *)offsetof(Vertex, boneIds));
     core::ErrorHandler::getOpenglError(__FILE__, __LINE__);
     break;
   case WEIGHT:

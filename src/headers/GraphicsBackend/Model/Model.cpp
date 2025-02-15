@@ -119,15 +119,15 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     } else
       vertex.texture = glm::vec2(0.0f, 0.0f);
 
-    if (mesh->HasBones()) {
-      for (int i = 0; i < mesh->mNumBones; i++) {
-        uint bone_index = 0;
-        std::string bone_name(mesh->mBones[i]->mName.data);
-        bone_index =
-      }
-    }
-
     vertices.push_back(vertex);
+  }
+
+  // process bones
+  if (mesh->HasBones()) {
+    for (int i = 0; i < mesh->mNumBones; i++) {
+      uint bone_index = 0;
+      std::string bone_name(mesh->mBones[i]->mName.data);
+    }
   }
 
   // now wak through each of the mesh's faces (a face is a mesh its triangle)
