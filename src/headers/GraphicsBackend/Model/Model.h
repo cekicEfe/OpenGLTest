@@ -29,15 +29,20 @@ namespace Model {
 class Model {
 public:
   Model(std::string const &path, bool gamma = false, bool flip_textures = true);
-  bool HasTexture() const;
+  ~Model();
 
+  bool HasTexture() const;
   void Draw(const Shader &shader) const;
 
-  ~Model();
+  auto &GetBoneInfoMap() { return m_BoneInfoMap; }
+  int &GetBoneCount() { return m_BoneCounter; }
 
 private:
   std::vector<Mesh> Meshes;
   std::vector<Texture> Textures;
+  std::map<std::string, BoneInfo> m_BoneInfoMap; //
+  int m_BoneCounter = 0;
+
   std::string directory;
   std::string path;
   bool gammaCorrection;

@@ -2,8 +2,8 @@
 #include "GraphicsBackend/Vertex/Vertex.h"
 #include <GraphicsBackend/Mesh/Mesh.hpp>
 
-Model::Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
-                  std::vector<Texture> textures) {
+Model::Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices,
+                  std::vector<Texture> &textures) {
   this->vertices = vertices;
   this->indices = indices;
   this->textures = textures;
