@@ -73,7 +73,7 @@ void testgame::GameHandler::demoShowGui() {
 
       if (ImGui::Button("Pick Model")) {
         std::string title("Pick Model");
-        std::vector<std::string> filter = {".obj", ".fbx"};
+        std::vector<std::string> filter = {".obj", ".fbx", ".dae"};
         preparePicker(browser, title, filter, picking_model);
       }
 
@@ -234,6 +234,13 @@ void testgame::GameHandler::demoShowGui() {
 
   {
     ImGui::Begin("Entities");
+    static int selected = -1;
+    ImGui::BulletText("Selected entity index : %d", selected);
+    if (ImGui::Button("Destroy selected object") && selected != -1 &&
+        selected < this->entities.size()) {
+      this->entities.erase(this->entities.begin() + selected);
+      selected = -1;
+    }
     for (size_t i = 0; i < this->entities.size(); i++) {
       std::string title = "Entity " + std::to_string(i + 1);
       if (ImGui::CollapsingHeader(title.c_str())) {
@@ -258,7 +265,12 @@ void testgame::GameHandler::demoShowGui() {
 
         ImGui::Unindent();
       }
+      ImGui::SameLine();
+      if (ImGui::Button(("Select" + title).c_str())) {
+        selected = i;
+      }
     }
+
     ImGui::End();
   }
 

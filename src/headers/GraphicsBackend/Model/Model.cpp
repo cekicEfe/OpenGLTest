@@ -2,6 +2,7 @@
 #include <GraphicsBackend/Model/Model.h>
 //
 #include "GraphicsBackend/Material/Material.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <assimp/types.h>
 #include <filesystem>
 #include <stb_image/stb_image.h>
@@ -124,36 +125,34 @@ Model::Mesh Model::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     vertices.push_back(vertex);
   }
 
-  // process bones
-  if (mesh->HasBones()) {
-    for (unsigned int i = 0; i < mesh->mNumBones; i++) {
-      std::string boneName = mesh->mBones[i]->mName.C_Str();
+  // walk through mesh bones
+  for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+    int boneID = -1;
+    std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+    if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end()) {
+      BoneInfo newBoneInfo;
+      newBoneInfo.id = m_BoneCounter;
+      newBoneInfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(
+          mesh->mBones[boneIndex]->mOffsetMatrix);
+      m_BoneInfoMap[boneName] = newBoneInfo;
+      boneID = m_BoneCounter;
+      m_BoneCounter++;
+    } else {
+      boneID = m_BoneInfoMap[boneName].id;
+    }
+    assert(boneID != -1);
+    auto weights = mesh->mBones[boneIndex]->mWeights;
+    int numWeights = mesh->mBones[boneIndex]->mNumWeights;
 
-      int boneIndex;
-      if (boneMapping.find(boneName) == boneMapping.end()) {
-        boneIndex = boneMapping.size();
-        boneMapping[boneName] = boneIndex;
-        auto offsetMatrix = mesh->mBones[i]->mOffsetMatrix;
-        boneOffsets.push_back(glm::transpose(glm::mat4(
-            offsetMatrix.a1, offsetMatrix.a2, offsetMatrix.a3, offsetMatrix.a4,
-            offsetMatrix.b1, offsetMatrix.b2, offsetMatrix.b3, offsetMatrix.b4,
-            offsetMatrix.c1, offsetMatrix.c2, offsetMatrix.c3, offsetMatrix.c4,
-            offsetMatrix.d1, offsetMatrix.d2, offsetMatrix.d3,
-            offsetMatrix.d4))); // Convert Assimp matrix
-      } else {
-        boneIndex = boneMapping[boneName];
-      }
-
-      for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
-        int vertexID = mesh->mBones[i]->mWeights[j].mVertexId;
-        float weight = mesh->mBones[i]->mWeights[j].mWeight;
-
-        for (int k = 0; k < 4; k++) {
-          if (vertices[vertexID].weights[k] == 0.0f) {
-            vertices[vertexID].boneIds[k] = boneIndex;
-            vertices[vertexID].weights[k] = weight;
-            break;
-          }
+    for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex) {
+      int vertexId = weights[weightIndex].mVertexId;
+      float weight = weights[weightIndex].mWeight;
+      assert(vertexId <= vertices.size());
+      for (int p = 0; p < 4; ++p) {
+        if (vertices[vertexId].boneIds[p] < 0) {
+          vertices[vertexId].weights[p] = weight;
+          vertices[vertexId].boneIds[p] = boneID;
+          break;
         }
       }
     }

@@ -18,11 +18,11 @@ public:
   std::vector<GLuint> indices;
   std::vector<Texture> textures;
 
-  std::map<std::string, int> boneMapping; // Bone name to index
-  std::vector<glm::mat4> boneOffsets;     // Bone offset matrices
+  std::map<std::string, uint> boneMapping; // Bone name to index
+  std::vector<glm::mat4> boneOffsets;      // Bone offset matrices
 
-  Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
-       std::vector<Texture> textures);
+  Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices,
+       std::vector<Texture> &textures);
   void Draw(const Shader &shader) const;
 
   VBO vbo;
