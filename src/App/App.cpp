@@ -24,15 +24,8 @@ void App::App::init() {
 
 void App::App::mainLoop() {
   while (!this->glfwHandler.checkWindowShouldClose()) {
-    static GLfloat deltaTime = this->gameHandler.calculateDeltaTime();
     this->glfwHandler.beginLoop();
-
-    this->gameHandler.processInput(
-        this->glfwHandler.returnMainWindow().returnGLFWWindow(), deltaTime);
-    this->gameHandler.update(deltaTime);
-
     this->gameHandler.demoMainLoop(glfwHandler.returnMainWindow());
-
     this->glfwHandler.endLoop();
   }
 }
