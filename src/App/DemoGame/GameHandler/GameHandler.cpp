@@ -284,24 +284,21 @@ void testgame::GameHandler::demoMainLoop(const core::Window &window) {
   this->processInput(window.returnGLFWWindow(), deltaTime);
   this->demoShowGui();
 
-  static Model::Model animatedModelDemo(
-      "/home/nixy/Documents/opengl/latest/OpenGLTest/models/vamp_model/"
-      "dancing_vampire.dae",
-      false, false);
+  // static Model::Model animatedModelDemo(
+  //     ,
+  //     false, false);
 
-  static Model::Animation animation(
-      "/home/nixy/Documents/opengl/latest/OpenGLTest/models/vamp_model/"
-      "dancing_vampire.dae",
-      &animatedModelDemo);
+  // static Model::Animation animation(
+  //     ,
+  //     &animatedModelDemo);
 
-  static Model::Animator animator(&animation);
-  static std::string vertPath("/home/nixy/Documents/opengl/latest/"
-                              "OpenGLTest/shaders/animShader.vert");
-  static std::string fragPath(
-      "/home/nixy/Documents/opengl/latest/OpenGLTest/shaders/animShader.frag");
-  static Shader animationShader(vertPath.c_str(), fragPath.c_str());
+  // static Model::Animator animator(&animation);
+  // static std::string vertPath();
+  // static std::string fragPath(
+  //     );
+  // static Shader animationShader(vertPath.c_str(), fragPath.c_str());
 
-  animator.UpdateAnimation(deltaTime);
+  // animator.UpdateAnimation(deltaTime);
 
   // Renders gameHandler owned objects
   for (size_t i = 0; i < this->entities.size(); i++) {
@@ -326,29 +323,30 @@ void testgame::GameHandler::demoMainLoop(const core::Window &window) {
   }
 
   // render demo animated object
-  animationShader.use();
-  glm::mat4 projection =
-      this->mainCamera.GetProjection(window.GetAspectRatio());
-  glm::mat4 view = this->mainCamera.GetViewMatrix();
-  animationShader.setMat4("projection", projection);
-  animationShader.setMat4("view", view);
+  // animationShader.use();
+  // glm::mat4 projection =
+  //     this->mainCamera.GetProjection(window.GetAspectRatio());
+  // glm::mat4 view = this->mainCamera.GetViewMatrix();
+  // animationShader.setMat4("projection", projection);
+  // animationShader.setMat4("view", view);
 
-  auto transforms = animator.GetFinalBoneMatrices();
-  for (int i = 0; i < transforms.size(); ++i)
-    animationShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]",
-                            transforms[i]);
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(
-      model,
-      glm::vec3(0.0f, -0.4f,
-                0.0f)); // translate it down so it's at the center of the scene
-  model = glm::scale(
-      model,
-      glm::vec3(.5f, .5f,
-                .5f)); // it's a bit too big for our scene, so scale it down
-  animationShader.setMat4("model", model);
-  animatedModelDemo.Draw(animationShader);
-  animationShader.stop();
+  // auto transforms = animator.GetFinalBoneMatrices();
+  // for (int i = 0; i < transforms.size(); ++i)
+  //   animationShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]",
+  //                           transforms[i]);
+  // glm::mat4 model = glm::mat4(1.0f);
+  // model = glm::translate(
+  //     model,
+  //     glm::vec3(0.0f, -0.4f,
+  //               0.0f)); // translate it down so it's at the center of the
+  //               scene
+  // model = glm::scale(
+  //     model,
+  //     glm::vec3(.5f, .5f,
+  //               .5f)); // it's a bit too big for our scene, so scale it down
+  // animationShader.setMat4("model", model);
+  // animatedModelDemo.Draw(animationShader);
+  // animationShader.stop();
 }
 
 void testgame::GameHandler::demoCleanup() {}

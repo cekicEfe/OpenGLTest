@@ -1,6 +1,5 @@
 build
 env-vars
 scenes/*
-models/
 .cache
 .vscode
