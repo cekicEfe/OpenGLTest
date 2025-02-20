@@ -13,11 +13,11 @@ private:
   std::weak_ptr<testgame::GameHitBox> mpHitbox;
   glm::vec3 mHitboxScale = {1.0f, 1.0f, 1.0f};
 
-  glm::vec3 mSpeedVec = {0.0f, 0.0f, 0.0f};
-  glm::vec3 mAccVec = {0.0f, 0.0f, 0.0f};
+  // glm::vec3 mSpeedVec = {0.0f, 0.0f, 0.0f};
+  // glm::vec3 mAccVec = {0.0f, 0.0f, 0.0f};
 
-  GLfloat mRotSpeed = 0;
-  GLfloat mRotAcc = 0;
+  // GLfloat mRotSpeed = 0;
+  // GLfloat mRotAcc = 0;
 
 public:
   GameEntity();
@@ -30,17 +30,17 @@ public:
 
   void setHitbox(const std::shared_ptr<testgame::GameHitBox> &hitbox);
   void setHitboxScale(const glm::vec3 &HBscale);
-  void setSpeedVec(const glm::vec3 &speedVec);
-  void setAccVec(const glm::vec3 &accVec);
-  void setRotSpeed(const GLfloat &rotSpeed);
-  void setRotAcc(const GLfloat &rocAcc);
+  // void setSpeedVec(const glm::vec3 &speedVec);
+  // void setAccVec(const glm::vec3 &accVec);
+  // void setRotSpeed(const GLfloat &rotSpeed);
+  // void setRotAcc(const GLfloat &rocAcc);
 
   const testgame::GameHitBox *const getHitBox() const;
   const glm::vec3 &getHitBoxScale() const;
-  const glm::vec3 &getSpeedVec() const;
-  const glm::vec3 &getAccVec() const;
-  const GLfloat &getRotSpeed() const;
-  const GLfloat &getRotAcc() const;
+  // const glm::vec3 &getSpeedVec() const;
+  // const glm::vec3 &getAccVec() const;
+  // const GLfloat &getRotSpeed() const;
+  // const GLfloat &getRotAcc() const;
 
   virtual void update(GLfloat deltaTime);
 };

@@ -55,6 +55,7 @@
           shellHook = ''
             	echo "OpenGL development environment is ready!"
                     PS1="[\\u@\\h && OPENGL-DEV-ENV:\\w]\$ "
+              echo ${pkgs.sol2}
             	'';
         };
       });

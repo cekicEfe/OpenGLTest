@@ -28,6 +28,7 @@ target_link_libraries(MAIN_EXEC
     glfw 
     assimp
     freetype
+    lua
 )
 
 target_include_directories(MAIN_EXEC PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src

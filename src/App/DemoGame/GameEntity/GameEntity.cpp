@@ -23,17 +23,17 @@ void GameEntity::setHitbox(
 void GameEntity::setHitboxScale(const glm::vec3 &HBscale) {
   this->mHitboxScale = HBscale;
 }
-void GameEntity::setSpeedVec(const glm::vec3 &speedVec) {
-  this->mSpeedVec = speedVec;
-}
-void GameEntity::setAccVec(const glm::vec3 &accVec) {
-  //
-  this->mAccVec = accVec;
-}
-void GameEntity::setRotSpeed(const GLfloat &rotSpeed) {
-  this->mRotSpeed = rotSpeed;
-}
-void GameEntity::setRotAcc(const GLfloat &rocAcc) { this->mRotAcc = rocAcc; }
+// void GameEntity::setSpeedVec(const glm::vec3 &speedVec) {
+//   this->mSpeedVec = speedVec;
+// }
+// void GameEntity::setAccVec(const glm::vec3 &accVec) {
+//   //
+//   this->mAccVec = accVec;
+// }
+// void GameEntity::setRotSpeed(const GLfloat &rotSpeed) {
+//   this->mRotSpeed = rotSpeed;
+// }
+// void GameEntity::setRotAcc(const GLfloat &rocAcc) { this->mRotAcc = rocAcc; }
 
 const testgame::GameHitBox *const GameEntity::getHitBox() const {
   return this->mpHitbox.lock().get();
@@ -41,9 +41,10 @@ const testgame::GameHitBox *const GameEntity::getHitBox() const {
 const glm::vec3 &GameEntity::getHitBoxScale() const {
   return this->mHitboxScale;
 }
-const glm::vec3 &GameEntity::getSpeedVec() const { return this->mSpeedVec; }
-const glm::vec3 &GameEntity::getAccVec() const { return this->mAccVec; }
-const GLfloat &GameEntity::getRotSpeed() const { return this->mRotSpeed; }
-const GLfloat &GameEntity::getRotAcc() const { return this->mRotAcc; }
+
+// const glm::vec3 &GameEntity::getSpeedVec() const { return this->mSpeedVec; }
+// const glm::vec3 &GameEntity::getAccVec() const { return this->mAccVec; }
+// const GLfloat &GameEntity::getRotSpeed() const { return this->mRotSpeed; }
+// const GLfloat &GameEntity::getRotAcc() const { return this->mRotAcc; }
 
 void GameEntity::update(GLfloat deltaTime) {}

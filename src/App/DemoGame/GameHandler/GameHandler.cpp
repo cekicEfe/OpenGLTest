@@ -3,25 +3,22 @@
 #include "App/DemoGame/GameLight/GameLight.hpp"
 #include "App/DemoGame/GameModel/GameModel.hpp"
 #include "App/DemoGame/GameShader/GameShader.hpp"
-#include "GraphicsBackend/Model/Model.h"
 #include "glfw3.h"
-#include "glm/ext/scalar_constants.hpp"
 #include "glm/gtc/constants.hpp"
 #include <GraphicsBackend/Animation/Animation.hpp>
 #include <GraphicsBackend/Animator/Animator.hpp>
 #include <assimp/anim.h>
 #include <assimp/material.h>
 #include <cstddef>
-#include <exception>
 #include <filesystem>
 #include <imgui.h>
 #include <memory>
-#include <optional>
+#include <sol/state.hpp>
 #include <string>
-#include <utility>
 
 namespace fs = std::filesystem;
 
+// sol::state testgame::GameHandler::scriptHandler;
 testgame::GameCamera testgame::GameHandler::mainCamera;
 bool testgame::GameHandler::menuIsUp = true;
 
@@ -29,7 +26,33 @@ testgame::GameHandler::GameHandler() {}
 
 testgame::GameHandler::~GameHandler() {}
 
-void testgame::GameHandler::demoInit() {}
+void testgame::GameHandler::demoInitLuaState() {
+  this->scriptHandler.reset();
+  this->scriptHandler = std::make_unique<sol::state>();
+  this->scriptHandler.get()->open_libraries(sol::lib::base);
+}
+
+void testgame::GameHandler::demoPassLuaCoreUtils() {
+  // Pass gameEntity
+  this->scriptHandler.get()->new_usertype<testgame::GameEntity>("GameEntity");
+  (*this->scriptHandler.get())["GameEntity"]["getPos"] =
+      [](testgame::GameEntity &self) -> std::vector<float> {
+    return {self.getPos().x, self.getPos().y, self.getPos().z};
+  };
+  (*this->scriptHandler.get())["GameEntity"]["setPos"] =
+      [](testgame::GameEntity &self, float x, float y, float z) -> void {
+    self.setPos({x, y, z});
+  };
+}
+
+void testgame::GameHandler::demoInitLua() {
+  this->demoInitLuaState();
+  this->demoPassLuaCoreUtils();
+}
+
+void testgame::GameHandler::demoStartLuaLoop() {}
+
+void testgame::GameHandler::demoInit() { demoInitLua(); }
 
 void testgame::GameHandler::demoShowGui() {
   static ImGui::FileBrowser browser;
@@ -283,7 +306,7 @@ void testgame::GameHandler::demoMainLoop(const core::Window &window) {
   float deltaTime = this->calculateDeltaTime();
   this->processInput(window.returnGLFWWindow(), deltaTime);
   this->demoShowGui();
-
+  this->demoStartLuaLoop();
   // static Model::Model animatedModelDemo(
   //     ,
   //     false, false);
@@ -301,26 +324,26 @@ void testgame::GameHandler::demoMainLoop(const core::Window &window) {
   // animator.UpdateAnimation(deltaTime);
 
   // Renders gameHandler owned objects
-  for (size_t i = 0; i < this->entities.size(); i++) {
-    auto entity_shader = this->entities[i].get()->getShader();
-    auto entity_model = this->entities[i].get()->getModel();
+  // for (size_t i = 0; i < this->entities.size(); i++) {
+  //   auto entity_shader = this->entities[i].get()->getShader();
+  //   auto entity_model = this->entities[i].get()->getModel();
 
-    if (entity_shader != nullptr && entity_model != nullptr) {
-      entity_shader->use();
+  //   if (entity_shader != nullptr && entity_model != nullptr) {
+  //     entity_shader->use();
 
-      glm::mat4 view = this->mainCamera.GetViewMatrix();
-      glm::mat4 projection =
-          this->mainCamera.GetProjection(window.GetAspectRatio());
-      glm::mat4 uniformAlig = this->entities[i].get()->getUniformAlignment();
+  //     glm::mat4 view = this->mainCamera.GetViewMatrix();
+  //     glm::mat4 projection =
+  //         this->mainCamera.GetProjection(window.GetAspectRatio());
+  //     glm::mat4 uniformAlig = this->entities[i].get()->getUniformAlignment();
 
-      entity_shader->setMat4("view", view);
-      entity_shader->setMat4("projection", projection);
-      entity_shader->setMat4("model", uniformAlig);
-      entity_model->Draw(*entity_shader);
+  //     entity_shader->setMat4("view", view);
+  //     entity_shader->setMat4("projection", projection);
+  //     entity_shader->setMat4("model", uniformAlig);
+  //     entity_model->Draw(*entity_shader);
 
-      entity_shader->stop();
-    }
-  }
+  //     entity_shader->stop();
+  //   }
+  // }
 
   // render demo animated object
   // animationShader.use();
