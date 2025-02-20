@@ -1,4 +1,4 @@
-echoString("testoTaylan imralı ziyareti")
+echoString("Test")
 local t = vec3:new()
 t:setX(13)
 print(t:getX())
