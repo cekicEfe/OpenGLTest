@@ -10,6 +10,9 @@
 #include "CoreBackend/GlfwHandler/WindowHandler/Window/Window.h"
 #include "imgui.h"
 #include "imguiFileExplorer/imfilebrowser.h"
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #define SOL_ALL_SAFETIES_ON 1
@@ -65,6 +68,8 @@ private:
   std::vector<std::shared_ptr<GameShader>> shaders;
   std::vector<std::shared_ptr<GameEntity>> entities;
   std::unique_ptr<sol::state> scriptHandler;
+  // Script <name> / <script itself>
+  std::map<std::string, std::shared_ptr<std::string>> entityScripts;
 
   static GameCamera mainCamera;
   static bool menuIsUp;

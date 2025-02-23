@@ -4,8 +4,8 @@ core::CoreEntity::CoreEntity() {}
 
 core::CoreEntity::CoreEntity(const std::shared_ptr<Model::Model> &model,
                              const std::shared_ptr<Shader> &shader,
-                             glm::vec3 modelScale, glm::vec3 pos, glm::vec3 rot,
-                             GLfloat rotrad) {
+                             const glm::vec3 &modelScale, const glm::vec3 &pos,
+                             const glm::vec3 &rot, const GLfloat &rotrad) {
   this->mpModel = model;
   this->mModelScale = modelScale;
   this->mpShader = shader;
@@ -17,11 +17,17 @@ core::CoreEntity::CoreEntity(const std::shared_ptr<Model::Model> &model,
 core::CoreEntity::~CoreEntity() {}
 
 const Model::Model *const core::CoreEntity::getModel() const {
-  return this->mpModel.lock().get();
+  if (this->mpModel.lock())
+    return this->mpModel.lock().get();
+  else
+    return nullptr;
 }
 
 const Shader *const core::CoreEntity::getShader() const {
-  return this->mpShader.lock().get();
+  if (this->mpShader.lock())
+    return this->mpShader.lock().get();
+  else
+    return nullptr;
 }
 
 const glm::vec3 &core::CoreEntity::getModelScale() const {

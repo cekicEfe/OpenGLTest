@@ -5,42 +5,37 @@
 #include "CoreBackend/CoreEntity/CoreEntity.h"
 #include "GraphicsBackend/Model/Model.h"
 #include "glm/fwd.hpp"
+#include <map>
 #include <memory>
+#include <sol/forward.hpp>
+#include <string>
 
 namespace testgame {
 class GameEntity : public core::CoreEntity {
 private:
   std::weak_ptr<testgame::GameHitBox> mpHitbox;
   glm::vec3 mHitboxScale = {1.0f, 1.0f, 1.0f};
-
-  // glm::vec3 mSpeedVec = {0.0f, 0.0f, 0.0f};
-  // glm::vec3 mAccVec = {0.0f, 0.0f, 0.0f};
-
-  // GLfloat mRotSpeed = 0;
-  // GLfloat mRotAcc = 0;
+  // script name / script itself
+  std::map<std::string, std::weak_ptr<std::string>> scripts;
 
 public:
+  std::unique_ptr<sol::table> externalTable;
+
   GameEntity();
   GameEntity(const std::shared_ptr<Model::Model> &model,
              const std::shared_ptr<Shader> &shader,
-             const std::shared_ptr<testgame::GameHitBox> hitbox,
-             glm::vec3 hitboxscale, glm::vec3 modelScale, glm::vec3 pos,
-             glm::vec3 rotaxis, GLfloat rotrad);
+             const std::shared_ptr<testgame::GameHitBox> &hitbox,
+             const std::map<std::string, std::shared_ptr<std::string>> &scripts,
+             const glm::vec3 &hitboxscale, const glm::vec3 &modelScale,
+             const glm::vec3 &pos, const glm::vec3 &rotaxis,
+             const GLfloat &rotrad);
   virtual ~GameEntity();
 
   void setHitbox(const std::shared_ptr<testgame::GameHitBox> &hitbox);
-  void setHitboxScale(const glm::vec3 &HBscale);
-  // void setSpeedVec(const glm::vec3 &speedVec);
-  // void setAccVec(const glm::vec3 &accVec);
-  // void setRotSpeed(const GLfloat &rotSpeed);
-  // void setRotAcc(const GLfloat &rocAcc);
-
   const testgame::GameHitBox *const getHitBox() const;
+
+  void setHitboxScale(const glm::vec3 &HBscale);
   const glm::vec3 &getHitBoxScale() const;
-  // const glm::vec3 &getSpeedVec() const;
-  // const glm::vec3 &getAccVec() const;
-  // const GLfloat &getRotSpeed() const;
-  // const GLfloat &getRotAcc() const;
 
   virtual void update(GLfloat deltaTime);
 };

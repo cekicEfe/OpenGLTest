@@ -21,8 +21,8 @@ private:
 public:
   CoreEntity();
   CoreEntity(const std::shared_ptr<Model::Model> &model,
-             const std::shared_ptr<Shader> &shader, glm::vec3 modelScale,
-             glm::vec3 pos, glm::vec3 rot, GLfloat rotrad);
+             const std::shared_ptr<Shader> &shader, const glm::vec3 &modelScale,
+             const glm::vec3 &pos, const glm::vec3 &rot, const GLfloat &rotrad);
   virtual ~CoreEntity();
 
   const Model::Model *const getModel() const;
