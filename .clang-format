@@ -1,0 +1,10 @@
+BasedOnStyle: GNU
+BinPackArguments: false
+IndentWidth: 2
+UseTab: Never
+BreakBeforeBraces: GNU
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
