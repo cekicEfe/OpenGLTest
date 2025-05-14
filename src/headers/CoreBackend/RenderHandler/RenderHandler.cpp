@@ -1,7 +1,7 @@
 #include "RenderHandler.h"
-#include "CoreBackend/CoreEntity/CoreEntity.h"
-#include "CoreBackend/GlfwHandler/WindowHandler/Window/Window.h"
-#include "GraphicsBackend/Buffers/VBO/VBO.h"
+#include "CoreBackend/CorePolicy/RenderableObject/RenderableObject.hpp"
+#include <CoreBackend/GlfwHandler/WindowHandler/Window/Window.h>
+#include <GraphicsBackend/Buffers/VBO/VBO.h>
 #include <cstddef>
 #include <glm/glm.hpp>
 #include <utility>
@@ -19,7 +19,7 @@ core::RenderHandler::RenderTest (const core::Window &window,
                                  const Camera *camera,
                                  const Model::Light *const lights,
                                  const size_t lights_size,
-                                 const core::CoreEntity *const entities,
+                                 const core::RenderableObject *const entities,
                                  const size_t entities_size) const
 {
   // //

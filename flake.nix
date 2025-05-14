@@ -15,9 +15,10 @@
           buildInputs = [
             pkgs.valgrind
             pkgs.glsl_analyzer
+            pkgs.cmake
+            pkgs.gcc
             pkgs.gdb
 
-            pkgs.freetype
             pkgs.libpng
             pkgs.pkg-config # To manage compilation flags
             pkgs.libxkbcommon
@@ -25,6 +26,10 @@
             pkgs.xorg.libX11
             pkgs.mesa
 
+            pkgs.cglm
+
+            pkgs.freetype
+            pkgs.nlohmann_json
             pkgs.lua
             pkgs.sol2
             pkgs.bullet
@@ -44,6 +49,8 @@
             pkgs.libGL
             pkgs.mesa
 
+            pkgs.cglm
+
             pkgs.lua
             pkgs.sol2
             pkgs.bullet
@@ -55,7 +62,6 @@
           shellHook = ''
             	echo "OpenGL development environment is ready!"
                     PS1="[\\u@\\h && OPENGL-DEV-ENV:\\w]\$ "
-              echo ${pkgs.sol2}
             	'';
         };
       });

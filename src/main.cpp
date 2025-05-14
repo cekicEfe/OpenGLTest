@@ -1,5 +1,6 @@
 #include "App/App.hpp"
 //
+#include <assimp/Importer.hpp>
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,8 +20,6 @@ using namespace core;
 int
 main (int argc, char **argv)
 {
-  // freopen ("log.txt", "w", stdout);
-  // std::cout << "Starting program" << std::endl;
 
   App::App app;
 

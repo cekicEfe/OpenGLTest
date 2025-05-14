@@ -2,9 +2,11 @@
 #define CUBEMAPMODEL_HPP
 
 #include "App/DemoGame/GameModel/GameModel.hpp"
-namespace testgame {
+namespace testgame
+{
 
-class CubemapModel : public testgame::GameModel {
+class CubemapModel : public testgame::GameModel
+{
 public:
 private:
 };

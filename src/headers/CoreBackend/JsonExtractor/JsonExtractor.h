@@ -4,8 +4,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <json/json.hpp>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace core

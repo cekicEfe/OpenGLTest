@@ -2,12 +2,8 @@
 #include "App/DemoGame/GameEntity/GameEntity.hpp"
 #include "App/DemoGame/GameLight/GameLight.hpp"
 #include "App/DemoGame/GameModel/GameModel.hpp"
-#include "App/DemoGame/GameSceneLoader/GameSceneLoader.hpp"
-#include "App/DemoGame/GameScript/GameScript.hpp"
 #include "App/DemoGame/GameShader/GameShader.hpp"
-#include "glfw3.h"
 #include "glm/gtc/constants.hpp"
-#include "json.hpp"
 #include <GraphicsBackend/Animation/Animation.hpp>
 #include <GraphicsBackend/Animator/Animator.hpp>
 #include <assimp/anim.h>
@@ -16,7 +12,6 @@
 #include <filesystem>
 #include <imgui.h>
 #include <memory>
-#include <sol/state.hpp>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -34,46 +29,9 @@ testgame::GameHandler::~GameHandler ()
 }
 
 void
-testgame::GameHandler::demoInitLuaState ()
-{
-  this->scriptHandler.reset ();
-  this->scriptHandler = std::make_unique<sol::state> ();
-  this->scriptHandler.get ()->open_libraries (sol::lib::base);
-}
-
-void
-testgame::GameHandler::demoPassLuaCoreUtils ()
-{
-  this->scriptHandler.get ()->set ("deltaTime", 0.0f);
-  // testgame::ShowGameEntityToLuaState (*this->scriptHandler.get ());
-  testgame::ShowVec3ToLuaState (*this->scriptHandler.get ());
-  testgame::ShowGameEntityToLuaState (*this->scriptHandler.get ());
-  this->scriptHandler.get ()->script_file (
-      "../scripts/Tests/MainTest/Main.lua");
-}
-
-void
-testgame::GameHandler::demoInitLua ()
-{
-  this->demoInitLuaState ();
-  this->demoPassLuaCoreUtils ();
-}
-
-void
-testgame::GameHandler::demoStartLuaLoop (float deltaTime)
-{
-}
-
-void
-testgame::GameHandler::demoCleanupLua ()
-{
-  this->scriptHandler.get ()->collect_garbage ();
-}
-
-void
 testgame::GameHandler::demoInit ()
 {
-  demoInitLua ();
+  // demoInitLua ();
 }
 
 void
@@ -248,8 +206,9 @@ testgame::GameHandler::demoShowGui ()
                       }
                     catch (...)
                       {
-                        std::cout << "While creating a shader an error occured"
-                                  << std::endl;
+                        std::cout
+                            << "While creating a shader an error occured "
+                            << std::endl;
                       }
                   }
               }
@@ -363,15 +322,15 @@ testgame::GameHandler::demoShowGui ()
 
             static GLfloat rotation;
             rotation = this->entities[i].get ()->getRotRad ();
-            std::string floater_title = std::to_string (i + 1) + " Rotation";
-            ImGui::DragFloat (floater_title.c_str (),
-                              &rotation,
-                              0.1,
-                              -glm::two_pi<float> (),
-                              glm::two_pi<float> ());
-            this->entities[i].get ()->setRotRad (rotation);
+             std::string floater_title = std::to_string (i + 1) + "
+             Rotation"; ImGui::DragFloat (floater_title.c_str (),
+                               &rotation,
+                               0.1,
+                               -glm::two_pi<float> (),
+                               glm::two_pi<float> ());
+             this->entities[i].get ()->setRotRad (rotation);
 
-            ImGui::Unindent ();
+             ImGui::Unindent ();
           }
         if (ImGui::Button (("Select" + title).c_str ()))
           {
@@ -391,7 +350,7 @@ testgame::GameHandler::demoMainLoop (const core::Window &window)
   float deltaTime = this->calculateDeltaTime ();
   this->processInput (window.returnGLFWWindow (), deltaTime);
   this->demoShowGui ();
-  this->demoStartLuaLoop (deltaTime);
+
   // static Model::Model animatedModelDemo(
   //     ,
   //     false, false);
@@ -407,29 +366,6 @@ testgame::GameHandler::demoMainLoop (const core::Window &window)
   // static Shader animationShader(vertPath.c_str(), fragPath.c_str());
 
   // animator.UpdateAnimation(deltaTime);
-
-  // Renders gameHandler owned objects
-  // for (size_t i = 0; i < this->entities.size(); i++) {
-  //   auto entity_shader = this->entities[i].get()->getShader();
-  //   auto entity_model = this->entities[i].get()->getModel();
-
-  //   if (entity_shader != nullptr && entity_model != nullptr) {
-  //     entity_shader->use();
-
-  //     glm::mat4 view = this->mainCamera.GetViewMatrix();
-  //     glm::mat4 projection =
-  //         this->mainCamera.GetProjection(window.GetAspectRatio());
-  //     glm::mat4 uniformAlig =
-  //     this->entities[i].get()->getUniformAlignment();
-
-  //     entity_shader->setMat4("view", view);
-  //     entity_shader->setMat4("projection", projection);
-  //     entity_shader->setMat4("model", uniformAlig);
-  //     entity_model->Draw(*entity_shader);
-
-  //     entity_shader->stop();
-  //   }
-  // }
 
   // render demo animated object
   // animationShader.use();
@@ -461,7 +397,7 @@ testgame::GameHandler::demoMainLoop (const core::Window &window)
 void
 testgame::GameHandler::demoCleanup ()
 {
-  this->demoCleanupLua ();
+  // this->demoCleanupLua ();
 }
 
 GLfloat

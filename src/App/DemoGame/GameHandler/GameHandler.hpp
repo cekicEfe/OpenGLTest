@@ -6,7 +6,6 @@
 #include "App/DemoGame/GameHitBox/GameHitBox.hpp"
 #include "App/DemoGame/GameLight/GameLight.hpp"
 #include "App/DemoGame/GameModel/GameModel.hpp"
-#include "App/DemoGame/GameScript/GameScript.hpp"
 #include "App/DemoGame/GameShader/GameShader.hpp"
 #include "CoreBackend/GlfwHandler/WindowHandler/Window/Window.h"
 #include "imgui.h"
@@ -28,11 +27,6 @@ private:
   std::vector<std::shared_ptr<GameShader> > shaders;
   std::vector<std::shared_ptr<GameEntity> > entities;
 
-  // Main script driver
-  std::unique_ptr<sol::state> scriptHandler;
-  // Script <name> / <script itself>
-  std::map<std::string, std::shared_ptr<std::string> > entityScripts;
-
   static GameCamera mainCamera;
   static bool menuIsUp;
 
@@ -40,12 +34,6 @@ private:
   GLfloat calculateDeltaTime ();
   void update (GLfloat deltaTime);
   void processInput (GLFWwindow *window, GLfloat deltaTime);
-
-  void demoInitLuaState ();
-  void demoPassLuaCoreUtils ();
-  void demoInitLua ();
-  void demoStartLuaLoop (float deltaTime);
-  void demoCleanupLua ();
 
 public:
   GameHandler ();

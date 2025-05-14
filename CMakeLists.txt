@@ -19,7 +19,7 @@ add_executable(MAIN_EXEC ${SOURCES})
 
 target_compile_options(MAIN_EXEC PUBLIC -std=c++17 -Wall -g 
   -I../src/headers
-  -I../include/GLFW
+#   -I../include/GLFW
 )
 
 target_link_libraries(MAIN_EXEC
@@ -37,7 +37,6 @@ target_include_directories(MAIN_EXEC PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src
                                          ${CMAKE_CURRENT_LIST_DIR}/include
                                          ${CMAKE_CURRENT_LIST_DIR}/include/glad
                                          ${CMAKE_CURRENT_LIST_DIR}/include/stb_image
-                                         ${CMAKE_CURRENT_LIST_DIR}/include/json
                                          ${CMAKE_CURRENT_LIST_DIR}/include/imguiFileExplorer
                                          )
 
